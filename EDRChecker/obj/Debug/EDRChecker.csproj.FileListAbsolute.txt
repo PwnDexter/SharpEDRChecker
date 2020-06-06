@@ -1,0 +1,6 @@
+C:\Users\Ross\source\repos\EDRChecker\EDRChecker\bin\Debug\EDRChecker.exe
+C:\Users\Ross\source\repos\EDRChecker\EDRChecker\bin\Debug\EDRChecker.pdb
+C:\Users\Ross\source\repos\EDRChecker\EDRChecker\obj\Debug\EDRChecker.csprojAssemblyReference.cache
+C:\Users\Ross\source\repos\EDRChecker\EDRChecker\obj\Debug\EDRChecker.csproj.CoreCompileInputs.cache
+C:\Users\Ross\source\repos\EDRChecker\EDRChecker\obj\Debug\EDRChecker.exe
+C:\Users\Ross\source\repos\EDRChecker\EDRChecker\obj\Debug\EDRChecker.pdb
