@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Principal;
 
 namespace EDRChecker
 {
@@ -38,7 +39,18 @@ namespace EDRChecker
         private static bool IsAdm()
         {
             Console.WriteLine("Checking Privileges Not Implemented");
-            return true;
+            //return true;
+            bool user;
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                user = principal.IsInRole(WindowsBuiltInRole.Administrator);
+                Console.WriteLine(user);
+            }
+            return user;
+           
+            //$user = [Security.Principal.WindowsIdentity]::GetCurrent();
+            //$isadm = (New - Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
         }
 
         private static bool ForceRegistryChecks(string[] args)
