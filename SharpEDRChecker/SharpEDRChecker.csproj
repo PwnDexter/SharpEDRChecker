@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{BDFEE233-3FED-42E5-AA64-492EB2AC7047}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>EDRChecker</RootNamespace>
-    <AssemblyName>EDRChecker</AssemblyName>
+    <RootNamespace>SharpEDRChecker</RootNamespace>
+    <AssemblyName>SharpEDRChecker</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

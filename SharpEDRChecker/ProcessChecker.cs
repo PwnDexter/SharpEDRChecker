@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Management;
 
-namespace EDRChecker
+namespace SharpEDRChecker
 {
     internal class ProcessChecker
     {
