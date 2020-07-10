@@ -6,43 +6,78 @@ namespace SharpEDRChecker
 {
     internal class ProcessChecker
     {
-        public static void CheckProcesses()
+        internal static void CheckProcesses()
         {
-            
-            //Get process listing
-            Process[] proclist = Process.GetProcesses();
-            Console.WriteLine("Current running processes are:");
-
-            foreach (Process i in proclist)
-            {
-                Console.WriteLine("Process: {0} ID: {1} ", i.ProcessName, i.Id);
-            }
-        }
-
-        public static void CheckCurrentProcessModules()
-        {
-            //Get your current process - GTG
-            Process myproc = Process.GetCurrentProcess();
-            Console.WriteLine("My procs loaded modules: {0} ID: {1} Name: {2}", myproc.Modules, myproc.Id, myproc.ProcessName);
-
-            // WMI Proc info
-            var searcher = new ManagementObjectSearcher("Select * From Win32_Process");
-            var processList = searcher.Get();
-
+            Console.WriteLine("\n[!] Checking processes...");
+            var processList = new ManagementObjectSearcher("Select * From Win32_Process").Get();
+            bool foundSuspiciousProcess = false;
             foreach (var process in processList)
             {
                 var processName = process["Name"];
                 var processPath = process["ExecutablePath"];
+                var allattribs = $"{processName} - {processPath}";
 
                 if (processPath != null)
                 {
-                    var fileVersionInfo = FileVersionInfo.GetVersionInfo(processPath.ToString());
-                    var processDescription = fileVersionInfo.FileDescription;
+                    allattribs = $"{allattribs} - {GetFileInfo(processPath.ToString())}";
+                }
 
-                    Console.WriteLine("WMI Proc Stuff");
-                    Console.WriteLine("{0} - {1}", processName, processDescription);
+                foreach (var edr in EDRData.edrlist)
+                {
+                    if (allattribs.ToLower().Contains(edr.ToLower()))
+                    {
+                        Console.WriteLine("\n***PLZ READ HERE FOR SUSPICIOUS PROCESS***");
+                        Console.WriteLine($"[-] {allattribs}");
+                        Console.WriteLine($"\tmatched: {edr}\n");
+                        foundSuspiciousProcess = true;
+                    }
                 }
             }
+            if (!foundSuspiciousProcess)
+            {
+                Console.WriteLine("[+] No suspicious processes found");
+            }
+        }
+
+        internal static void CheckCurrentProcessModules()
+        {
+            Console.WriteLine("\n[!] Checking modules loaded in your current process...");
+            Process myproc = Process.GetCurrentProcess();
+            bool foundSuspiciousModule = false;
+            foreach (ProcessModule module in myproc.Modules)
+            {
+                var allattribs = $"{module.FileName} - {GetFileInfo(module.FileName)}";
+
+                foreach (var edr in EDRData.edrlist)
+                {
+                    if (module.ToString().ToLower().Contains(edr.ToLower()))
+                    {
+                        Console.WriteLine("\n***PLZ READ HERE FOR SUSPICIOUS DLLS IN YER PROCESS***");
+                        Console.WriteLine($"[-] {allattribs}");
+                        Console.WriteLine($"\tmatched: {edr}\n");
+                        foundSuspiciousModule = true;
+                    }
+                }
+            }
+            if (!foundSuspiciousModule)
+            {
+                Console.WriteLine("[+] No suspicious modules found in your process");
+            }
+        }
+
+        private static string GetFileInfo(string filePath)
+        {
+            var fileVersionInfo = FileVersionInfo.GetVersionInfo(filePath.ToString());
+            return $"{fileVersionInfo.ProductName} -" +
+                $" {fileVersionInfo.FileName} -" +
+                $" {fileVersionInfo.OriginalFilename} -" +
+                $" {fileVersionInfo.InternalName} -" +
+                $" {fileVersionInfo.CompanyName} -" +
+                $" {fileVersionInfo.FileDescription} -" +
+                $" {fileVersionInfo.ProductVersion} -" +
+                $" {fileVersionInfo.Comments} -" +
+                $" {fileVersionInfo.LegalCopyright} -" +
+                $" {fileVersionInfo.LegalTrademarks}";
         }
     }
 }

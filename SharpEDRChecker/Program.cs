@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Security.Principal;
 
 namespace SharpEDRChecker
@@ -7,52 +8,42 @@ namespace SharpEDRChecker
     {
         static void Main(string[] args)
         {
-            PrintIntro();
+            bool isAdm = PrivilegeChecker.PrivCheck();
+            PrintIntro(isAdm);
             ProcessChecker.CheckProcesses();
             ProcessChecker.CheckCurrentProcessModules();
-            DirectoryChecker.CheckDirectories();
-            ServiceChecker.CheckServices();
-
-            if (IsAdm() || ForceRegistryChecks(args))
+            //DirectoryChecker.CheckDirectories();
+            //ServiceChecker.CheckServices();
+            
+            if (isAdm || ForceRegistryChecks(args))
             {
-                RegistryChecker.CheckRegistry();
+                //RegistryChecker.CheckRegistry();
             }
-            if (IsAdm())
+
+            if (isAdm)
             {
-                DriverChecker.CheckDrivers();
+               //DriverChecker.CheckDrivers();
             }
             PrintOutro();
         }
 
-        private static void PrintIntro()
+        private static void PrintIntro(bool isAdm)
         {
-            Console.WriteLine("Welcome to EDRChecker by @PwnDexter");
-            Console.WriteLine("EDR Products to look for:");
-
-            //Print the list of EDR Products
-            foreach (string edr in EDRData.edrlist)
+            Console.WriteLine("Welcome to EDRChecker by @PwnDexter\n");
+            if(isAdm)
             {
-                Console.WriteLine(edr);
+                Console.WriteLine("[+] Running as admin, all checks will be performed");
             }
-        }
-
-        private static bool IsAdm()
-        {
-            Console.WriteLine("Checking Privileges Not Implemented");
-            bool user;
-            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            else
             {
-                WindowsPrincipal principal = new WindowsPrincipal(identity);
-                user = principal.IsInRole(WindowsBuiltInRole.Administrator);
-                Console.WriteLine(user);
+                Console.WriteLine("[-] Not running as admin, process metadata, registry and drivers will not be checked");
+                Console.WriteLine("[-] Use the -Force flag to force registry checks when not running as admin");
             }
-            return user;
         }
 
         private static bool ForceRegistryChecks(string[] args)
         {
-            Console.WriteLine("Checking Arguments Not Implemented");
-            return true;
+            return false;
         }
 
         private static void PrintOutro()

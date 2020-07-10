@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ServiceProcess;
 
 namespace SharpEDRChecker
 {
@@ -6,7 +7,11 @@ namespace SharpEDRChecker
     {
         internal static void CheckDrivers()
         {
-            Console.WriteLine("Checking Drivers Not Implemented");
+            Console.WriteLine("[!] Checking Drivers");
+            foreach (ServiceController driver in ServiceController.GetDevices())
+            {
+                Console.WriteLine($"{driver.DisplayName} {driver.ServiceName} {driver.Status} {driver.ServiceType}");
+            }
         }
     }
 }

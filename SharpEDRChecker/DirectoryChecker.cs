@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace SharpEDRChecker
 {
@@ -6,7 +7,24 @@ namespace SharpEDRChecker
     {
         internal static void CheckDirectories()
         {
-            Console.WriteLine("Checking Directories Not Implemented");
+            Console.WriteLine("[!] Checking Directories");
+            {
+                string[] progdirs = {
+                    @"C:\Program Files",
+                    @"C:\Program Files (x86)",
+                    @"C:\ProgramData"};
+
+                foreach (string dir in progdirs)
+                {
+                    string[] subdirectories = Directory.GetDirectories(dir);
+                    Console.WriteLine("Directories:");
+
+                    foreach (var subdirectory in subdirectories)
+                    {
+                        Console.WriteLine(subdirectory);
+                    }
+                }
+            }
         }
     }
 }
