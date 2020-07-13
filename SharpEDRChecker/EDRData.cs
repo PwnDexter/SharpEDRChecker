@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SharpEDRChecker
+﻿namespace SharpEDRChecker
 {
     class EDRData
     {

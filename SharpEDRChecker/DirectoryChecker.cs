@@ -7,7 +7,8 @@ namespace SharpEDRChecker
     {
         internal static void CheckDirectories()
         {
-            Console.WriteLine("[!] Checking Directories");
+            Console.WriteLine("[!] Checking Directories...");
+            bool foundSuspiciousDirectory = false;
             {
                 string[] progdirs = {
                     @"C:\Program Files",
@@ -17,13 +18,24 @@ namespace SharpEDRChecker
                 foreach (string dir in progdirs)
                 {
                     string[] subdirectories = Directory.GetDirectories(dir);
-                    Console.WriteLine("Directories:");
-
                     foreach (var subdirectory in subdirectories)
                     {
-                        Console.WriteLine(subdirectory);
+                        foreach (var edrstring in EDRData.edrlist)
+                        {
+                            if (subdirectory.ToString().ToLower().Contains(edrstring.ToLower()))
+                            {
+                                Console.WriteLine("\n***PLZ READ HERE FOR SUSPICIOUS DIRECTORIES***");
+                                Console.WriteLine($"[-] {subdirectory}");
+                                Console.WriteLine($"[!] Matched on: {edrstring}\n");
+                                foundSuspiciousDirectory = true;
+                            }
+                        }
                     }
                 }
+            }
+            if (!foundSuspiciousDirectory)
+            {
+                Console.WriteLine("[+] No suspicious directories found\n");
             }
         }
     }

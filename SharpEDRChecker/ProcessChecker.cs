@@ -8,7 +8,7 @@ namespace SharpEDRChecker
     {
         internal static void CheckProcesses()
         {
-            Console.WriteLine("\n[!] Checking processes...");
+            Console.WriteLine("[!] Checking processes...");
             var processList = new ManagementObjectSearcher("Select * From Win32_Process").Get();
             bool foundSuspiciousProcess = false;
             foreach (var process in processList)
@@ -22,46 +22,46 @@ namespace SharpEDRChecker
                     allattribs = $"{allattribs} - {GetFileInfo(processPath.ToString())}";
                 }
 
-                foreach (var edr in EDRData.edrlist)
+                foreach (var edrstring in EDRData.edrlist)
                 {
-                    if (allattribs.ToLower().Contains(edr.ToLower()))
+                    if (allattribs.ToLower().Contains(edrstring.ToLower()))
                     {
                         Console.WriteLine("\n***PLZ READ HERE FOR SUSPICIOUS PROCESS***");
-                        Console.WriteLine($"[-] {allattribs}");
-                        Console.WriteLine($"\tmatched: {edr}\n");
+                        Console.WriteLine($"[-] Suspicious process found: {allattribs}");
+                        Console.WriteLine($"[!] Matched on: {edrstring}\n");
                         foundSuspiciousProcess = true;
                     }
                 }
             }
             if (!foundSuspiciousProcess)
             {
-                Console.WriteLine("[+] No suspicious processes found");
+                Console.WriteLine("[+] No suspicious processes found\n");
             }
         }
 
         internal static void CheckCurrentProcessModules()
         {
-            Console.WriteLine("\n[!] Checking modules loaded in your current process...");
+            Console.WriteLine("[!] Checking modules loaded in your current process...");
             Process myproc = Process.GetCurrentProcess();
             bool foundSuspiciousModule = false;
             foreach (ProcessModule module in myproc.Modules)
             {
                 var allattribs = $"{module.FileName} - {GetFileInfo(module.FileName)}";
 
-                foreach (var edr in EDRData.edrlist)
+                foreach (var edrstring in EDRData.edrlist)
                 {
-                    if (module.ToString().ToLower().Contains(edr.ToLower()))
+                    if (module.ToString().ToLower().Contains(edrstring.ToLower()))
                     {
                         Console.WriteLine("\n***PLZ READ HERE FOR SUSPICIOUS DLLS IN YER PROCESS***");
                         Console.WriteLine($"[-] {allattribs}");
-                        Console.WriteLine($"\tmatched: {edr}\n");
+                        Console.WriteLine($"[!] Matched on: {edrstring}\n");
                         foundSuspiciousModule = true;
                     }
                 }
             }
             if (!foundSuspiciousModule)
             {
-                Console.WriteLine("[+] No suspicious modules found in your process");
+                Console.WriteLine("[+] No suspicious modules found in your process\n");
             }
         }
 
