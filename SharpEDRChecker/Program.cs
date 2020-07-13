@@ -8,10 +8,10 @@ namespace SharpEDRChecker
         {
             bool isAdm = PrivilegeChecker.PrivCheck();
             PrintIntro(isAdm);
-            //ProcessChecker.CheckProcesses();
-            //ProcessChecker.CheckCurrentProcessModules();
+            ProcessChecker.CheckProcesses();
+            ProcessChecker.CheckCurrentProcessModules();
             //DirectoryChecker.CheckDirectories();
-            ServiceChecker.CheckServices();
+            //ServiceChecker.CheckServices();
             
             if (isAdm || ForceRegistryChecks(args))
             {

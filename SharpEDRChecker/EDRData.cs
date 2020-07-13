@@ -83,7 +83,7 @@
                 "wincollect",
                 "windowssensor",
                 "wireshark",
-                "xag"
+                "xagt"
             };
     }
 }

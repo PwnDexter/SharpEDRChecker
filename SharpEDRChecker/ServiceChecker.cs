@@ -31,14 +31,14 @@ namespace SharpEDRChecker
                     if (allattribs.ToLower().Contains(edrstring.ToLower()))
                     {
                         Console.WriteLine($"[-] Suspicious service found:" +
-                            $"\n \t Name: {serviceName}" + 
-                            $"\n \t DisplayName: {serviceDisplayName}" +
-                            $"\n \t Description: {serviceDescription}" +
-                            $"\n \t Caption: {serviceCaption}" +
-                            $"\n \t Binary: {servicePathName}" +
-                            $"\n \t Status: {serviceState}" +
-                            $"\n \t Process ID: {servicePID}");
-                        Console.WriteLine($"[!] Matched on: {edrstring}\n");
+                            $"\n\tName: {serviceName}" + 
+                            $"\n\tDisplayName: {serviceDisplayName}" +
+                            $"\n\tDescription: {serviceDescription}" +
+                            $"\n\tCaption: {serviceCaption}" +
+                            $"\n\tBinary: {servicePathName}" +
+                            $"\n\tStatus: {serviceState}" +
+                            $"\n\tProcess ID: {servicePID}" +
+                            $"\n[!] Matched on: {edrstring}\n");
                         foundSuspiciousService = true;
                     }
                 }
