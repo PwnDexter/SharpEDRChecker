@@ -31,8 +31,8 @@ namespace SharpEDRChecker
 
                 if (processPath != null)
                 {
-                    allattribs = $"{allattribs} - {GetFileInfo(processPath.ToString())}";
                     metadata = $"{GetFileInfo(processPath.ToString())}";
+                    allattribs = $"{allattribs} - {metadata}";
                 }
 
                 foreach (var edrstring in EDRData.edrlist)
