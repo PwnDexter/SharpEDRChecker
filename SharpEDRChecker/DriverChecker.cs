@@ -2,86 +2,84 @@
 using System.Management;
 using System.Diagnostics;
 using System.ServiceProcess;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace SharpEDRChecker
 {
     internal class DriverChecker
     {
+        [DllImport("psapi")]
+        private static extern bool EnumDeviceDrivers(
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U4)][In][Out] UInt32[] ddAddresses,
+            UInt32 arraySizeBytes,
+            [MarshalAs(UnmanagedType.U4)] out UInt32 bytesNeeded);
+
+        [DllImport("psapi")]
+        private static extern int GetDeviceDriverBaseName(
+            UInt32 ddAddress,
+            StringBuilder ddBaseName,
+            int baseNameStringSizeChars);
+
         internal static void CheckDrivers()
         {
-            /*Console.WriteLine("[!] Checking Drivers...");
-            foreach (ServiceController driver in ServiceController.GetDevices())
-            {
-                Console.WriteLine($"{driver.DisplayName} {driver.ServiceName} {driver.Status} {driver.ServiceType}");
-            }*/
-            
-            //TESTING METHOD
-            /*SelectQuery query = new SelectQuery("Win32_BaseService");
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
-            foreach (ManagementObject ManageObject in searcher.Get())
-            {
-                Console.WriteLine(ManageObject.GetPropertyValue("Name"));
-                Console.WriteLine(ManageObject.GetPropertyValue("PathName"));
-                Console.WriteLine(ManageObject.GetPropertyValue("Description"));
-                Console.WriteLine(ManageObject.GetPropertyValue("Caption"));
-                Console.WriteLine(ManageObject.GetPropertyValue("DisplayName"));
-                Console.WriteLine(ManageObject.GetPropertyValue("SystemName"));
-                Console.WriteLine(ManageObject.GetPropertyValue("StartName"));
-                Console.WriteLine(ManageObject.GetPropertyValue("CreationClassName"));
-                Console.WriteLine(ManageObject.GetPropertyValue("Started"));
-                Console.WriteLine(ManageObject.GetPropertyValue("TagId"));
-                Console.WriteLine(ManageObject.GetPropertyValue("SystemCreationClassNAme"));
-            }*/
+            UInt32 arraySize;
+            UInt32 arraySizeBytes;
+            UInt32[] ddAddresses;
+            UInt32 bytesNeeded;
+            bool success;
 
+            // Figure out how large an array we need to hold the device driver 'load addresses'
+            success = EnumDeviceDrivers(null, 0, out bytesNeeded);
 
-            
-            //WORKING WMI FOR SYSTEMDRIVERS BUT NOT MINI FILTERS
-            var driverList = new ManagementObjectSearcher("Select * From Win32_Service").Get();
-            bool foundSuspiciousDriver = false;
-            foreach (var driver in driverList)
+            Console.WriteLine("Success? " + success);
+            Console.WriteLine("Array bytes needed? " + bytesNeeded);
+
+            if (!success)
             {
-                foundSuspiciousDriver = CheckDriver(driver) || foundSuspiciousDriver;
+                Console.WriteLine("Call to EnumDeviceDrivers failed!");
+                int error = Marshal.GetLastWin32Error();
+                Console.WriteLine("The last Win32 Error was: " + error);
+                return;
             }
-            if (!foundSuspiciousDriver)
+            if (bytesNeeded == 0)
             {
-                Console.WriteLine("[+] No suspicious drivers found\n");
+                Console.WriteLine("Apparently, there were NO device drivers to enumerate.  Strange.");
+                return;
             }
-        }
+            // Allocate the array; as each ID is a 4-byte int, it should be 1/4th the size of bytesNeeded
+            arraySize = bytesNeeded / 4;
+            arraySizeBytes = bytesNeeded;
+            ddAddresses = new UInt32[arraySize];
 
-        private static bool CheckDriver(ManagementBaseObject driver)
-        {
-            bool foundSuspiciousDriver = false;
-            var driverName = driver["Name"];
-            var driverDisplayName = driver["DisplayName"];
-            var driverDescription = driver["Description"];
-            var driverCaption = driver["Caption"];
-            var driverPathName = driver["PathName"];
-            var driverState = driver["State"];
-            var driverStartName = driver["StartName"];
+            // Now fill it
+            success = EnumDeviceDrivers(ddAddresses, arraySizeBytes, out bytesNeeded);
 
-            var allattribs = $"{driverName} - " +
-                $"{driverDisplayName} - " +
-                $"{driverDescription} - " +
-                $"{driverCaption} - " +
-                $"{driverPathName}";
-
-            foreach (var edrstring in EDRData.edrlist)
+            if (!success)
             {
-                if (allattribs.ToLower().Contains(edrstring.ToLower()))
+                Console.WriteLine("Call to EnumDeviceDrivers failed!");
+                int error = Marshal.GetLastWin32Error();
+                Console.WriteLine("The last Win32 Error was: " + error);
+                return;
+            }
+            for (int i = 0; i < arraySize; i++)
+            {
+                // If the length of the device driver base name is over 1000 characters, good luck to it.  :-)
+                StringBuilder sb = new StringBuilder(1000);
+
+                int result = GetDeviceDriverBaseName(ddAddresses[i], sb, sb.Capacity);
+
+                if(result == 0)
                 {
-                    Console.WriteLine($"[-] Suspicious driver found:" +
-                        $"\n\tName: {driverName}" +
-                        $"\n\tDisplayName: {driverDisplayName}" +
-                        $"\n\tDescription: {driverDescription}" +
-                        $"\n\tCaption: {driverCaption}" +
-                        $"\n\tBinary: {driverPathName}" +
-                        $"\n\tStatus: {driverState}" +
-                        $"\n\tStartName: {driverStartName}" +
-                        $"\n[!] Matched on: {edrstring}\n");
-                    foundSuspiciousDriver = true;
+                    int error = Marshal.GetLastWin32Error();
+                    Console.WriteLine("The last Win32 Error was: " + error);
                 }
+                else
+                {
+                    Console.WriteLine("Device driver LoadAddress: " + ddAddresses[i] + ", BaseName: " + sb.ToString());
+                }
+
             }
-            return foundSuspiciousDriver;
         }
     }
 }
