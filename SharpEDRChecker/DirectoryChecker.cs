@@ -24,8 +24,7 @@ namespace SharpEDRChecker
                         {
                             if (subdirectory.ToString().ToLower().Contains(edrstring.ToLower()))
                             {
-                                Console.WriteLine("\n***PLZ READ HERE FOR SUSPICIOUS DIRECTORIES***");
-                                Console.WriteLine($"[-] {subdirectory}");
+                                Console.WriteLine($"[-] Suspicious directory found: {subdirectory}");
                                 Console.WriteLine($"[!] Matched on: {edrstring}\n");
                                 foundSuspiciousDirectory = true;
                             }

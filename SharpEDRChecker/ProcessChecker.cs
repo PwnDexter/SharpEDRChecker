@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Management;
-using System.Threading;
 
 namespace SharpEDRChecker
 {
@@ -14,49 +13,56 @@ namespace SharpEDRChecker
             bool foundSuspiciousProcess = false;
             foreach (var process in processList)
             {
-                var processName = process["Name"];
-                var processPath = process["ExecutablePath"];
-                var processDescription = process["Description"];
-                var processCaption = process["Caption"];
-                var processCmdLine = process["CommandLine"];
-                var processPID = process["ProcessId"];
-                var processParent = process["ParentProcessId"];
-                var metadata = "";
-
-                var allattribs = $"{processName} - " +
-                    $"{processPath} - " +
-                    $"{processDescription} - " +
-                    $"{processCaption} - " +
-                    $"{processCmdLine}";
-
-                if (processPath != null)
-                {
-                    metadata = $"{GetFileInfo(processPath.ToString())}";
-                    allattribs = $"{allattribs} - {metadata}";
-                }
-
-                foreach (var edrstring in EDRData.edrlist)
-                {
-                    if (allattribs.ToLower().Contains(edrstring.ToLower()))
-                    {
-                        Console.WriteLine($"[-] Suspicious process found:" +
-                            $"\n\tName: {processName}" +
-                            $"\n\tDescription: {processDescription}" +
-                            $"\n\tCaption: {processCaption}" +
-                            $"\n\tBinary: {processPath}" +
-                            $"\n\tProcess ID: {processPID}" +
-                            $"\n\tParent Process: {processParent}" +
-                            $"\n\tProcess CmdLine: {processCmdLine}" +
-                            $"\n\tMetadata: {metadata}" +
-                            $"\n[!] Matched on: {edrstring}\n");
-                        foundSuspiciousProcess = true;
-                    }
-                }
+                foundSuspiciousProcess = CheckProcess(process) || foundSuspiciousProcess;
             }
             if (!foundSuspiciousProcess)
             {
                 Console.WriteLine("[+] No suspicious processes found\n");
             }
+        }
+
+        private static bool CheckProcess(ManagementBaseObject process)
+        {
+            bool foundSuspiciousProcess = false;
+            var processName = process["Name"];
+            var processPath = process["ExecutablePath"];
+            var processDescription = process["Description"];
+            var processCaption = process["Caption"];
+            var processCmdLine = process["CommandLine"];
+            var processPID = process["ProcessId"];
+            var processParent = process["ParentProcessId"];
+            var metadata = "";
+
+            var allattribs = $"{processName} - " +
+                $"{processPath} - " +
+                $"{processDescription} - " +
+                $"{processCaption} - " +
+                $"{processCmdLine}";
+
+            if (processPath != null)
+            {
+                metadata = $"{GetFileInfo(processPath.ToString())}";
+                allattribs = $"{allattribs} - {metadata}";
+            }
+
+            foreach (var edrstring in EDRData.edrlist)
+            {
+                if (allattribs.ToLower().Contains(edrstring.ToLower()))
+                {
+                    Console.WriteLine($"[-] Suspicious process found:" +
+                        $"\n\tName: {processName}" +
+                        $"\n\tDescription: {processDescription}" +
+                        $"\n\tCaption: {processCaption}" +
+                        $"\n\tBinary: {processPath}" +
+                        $"\n\tProcess ID: {processPID}" +
+                        $"\n\tParent Process: {processParent}" +
+                        $"\n\tProcess CmdLine: {processCmdLine}" +
+                        $"\n\tMetadata: {metadata}" +
+                        $"\n[!] Matched on: {edrstring}\n");
+                    foundSuspiciousProcess = true;
+                }
+            }
+            return foundSuspiciousProcess;
         }
 
         internal static void CheckCurrentProcessModules()

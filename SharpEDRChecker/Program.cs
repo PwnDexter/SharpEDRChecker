@@ -10,9 +10,10 @@ namespace SharpEDRChecker
             PrintIntro(isAdm);
             ProcessChecker.CheckProcesses();
             ProcessChecker.CheckCurrentProcessModules();
-            //DirectoryChecker.CheckDirectories();
-            //ServiceChecker.CheckServices();
-            
+            DirectoryChecker.CheckDirectories();
+            ServiceChecker.CheckServices();
+            //DriverChecker.CheckDrivers();
+
             if (isAdm || ForceRegistryChecks(args))
             {
                 //RegistryChecker.CheckRegistry();
