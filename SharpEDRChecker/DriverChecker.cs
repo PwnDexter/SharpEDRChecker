@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.ServiceProcess;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.CodeDom;
 
 namespace SharpEDRChecker
 {
@@ -11,22 +12,22 @@ namespace SharpEDRChecker
     {
         [DllImport("psapi")]
         private static extern bool EnumDeviceDrivers(
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U4)][In][Out] UInt32[] ddAddresses,
-            UInt32 arraySizeBytes,
-            [MarshalAs(UnmanagedType.U4)] out UInt32 bytesNeeded);
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U4)][In][Out] uint[] ddAddresses,
+            uint arraySizeBytes,
+            [MarshalAs(UnmanagedType.U4)] out uint bytesNeeded);
 
         [DllImport("psapi")]
         private static extern int GetDeviceDriverBaseName(
-            UInt32 ddAddress,
+            uint ddAddress,
             StringBuilder ddBaseName,
             int baseNameStringSizeChars);
 
         internal static void CheckDrivers()
         {
-            UInt32 arraySize;
-            UInt32 arraySizeBytes;
-            UInt32[] ddAddresses;
-            UInt32 bytesNeeded;
+            uint arraySize;
+            uint arraySizeBytes;
+            uint[] ddAddresses;
+            uint bytesNeeded;
             bool success;
 
             // Figure out how large an array we need to hold the device driver 'load addresses'
@@ -48,9 +49,9 @@ namespace SharpEDRChecker
                 return;
             }
             // Allocate the array; as each ID is a 4-byte int, it should be 1/4th the size of bytesNeeded
-            arraySize = bytesNeeded / 4;
+            arraySize = bytesNeeded / (uint)IntPtr.Size;
             arraySizeBytes = bytesNeeded;
-            ddAddresses = new UInt32[arraySize];
+            ddAddresses = new uint[arraySize];
 
             // Now fill it
             success = EnumDeviceDrivers(ddAddresses, arraySizeBytes, out bytesNeeded);
@@ -62,10 +63,12 @@ namespace SharpEDRChecker
                 Console.WriteLine("The last Win32 Error was: " + error);
                 return;
             }
+            Console.WriteLine($"Number of drivers: {arraySize}");
+
             for (int i = 0; i < arraySize; i++)
             {
                 // If the length of the device driver base name is over 1000 characters, good luck to it.  :-)
-                StringBuilder sb = new StringBuilder(1000);
+                StringBuilder sb = new StringBuilder(2000);
 
                 int result = GetDeviceDriverBaseName(ddAddresses[i], sb, sb.Capacity);
 

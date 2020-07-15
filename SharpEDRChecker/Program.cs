@@ -14,7 +14,7 @@ namespace SharpEDRChecker
             //ServiceChecker.CheckServices();
             DriverChecker.CheckDrivers();
 
-            if (isAdm || ForceRegistryChecks(args))
+            /*if (isAdm || ForceRegistryChecks(args))
             {
                 //RegistryChecker.CheckRegistry();
             }
@@ -22,7 +22,7 @@ namespace SharpEDRChecker
             if (isAdm)
             {
                //DriverChecker.CheckDrivers();
-            }
+            }*/
             PrintOutro();
         }
 
