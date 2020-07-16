@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Management;
 
@@ -23,7 +24,6 @@ namespace SharpEDRChecker
 
         private static bool CheckProcess(ManagementBaseObject process)
         {
-            bool foundSuspiciousProcess = false;
             var processName = process["Name"];
             var processPath = process["ExecutablePath"];
             var processDescription = process["Description"];
@@ -45,24 +45,29 @@ namespace SharpEDRChecker
                 allattribs = $"{allattribs} - {metadata}";
             }
 
+            var matches = new List<string>();
             foreach (var edrstring in EDRData.edrlist)
             {
                 if (allattribs.ToLower().Contains(edrstring.ToLower()))
                 {
-                    Console.WriteLine($"[-] Suspicious process found:" +
-                        $"\n\tName: {processName}" +
-                        $"\n\tDescription: {processDescription}" +
-                        $"\n\tCaption: {processCaption}" +
-                        $"\n\tBinary: {processPath}" +
-                        $"\n\tProcess ID: {processPID}" +
-                        $"\n\tParent Process: {processParent}" +
-                        $"\n\tProcess CmdLine: {processCmdLine}" +
-                        $"\n\tFile Metadata: {metadata}" +
-                        $"\n[!] Matched on: {edrstring}\n");
-                    foundSuspiciousProcess = true;
+                    matches.Add(edrstring);
                 }
             }
-            return foundSuspiciousProcess;
+            if (matches.Count > 0)
+            {
+                Console.WriteLine($"[-] Suspicious process found:" +
+                            $"\n\tName: {processName}" +
+                            $"\n\tDescription: {processDescription}" +
+                            $"\n\tCaption: {processCaption}" +
+                            $"\n\tBinary: {processPath}" +
+                            $"\n\tProcess ID: {processPID}" +
+                            $"\n\tParent Process: {processParent}" +
+                            $"\n\tProcess CmdLine: {processCmdLine}" +
+                            $"\n\tFile Metadata: {metadata}" +
+                            $"\n[!] Matched on: {string.Join(", ", matches)}\n");
+                return true;
+            }
+            return false;
         }
 
         internal static void CheckCurrentProcessModules()
@@ -80,7 +85,8 @@ namespace SharpEDRChecker
                     if (module.ToString().ToLower().Contains(edrstring.ToLower()))
                     {
                         Console.WriteLine("[-] Suspicious modload found in your process:" +
-                            $"{metadata}" +
+                            $"\n\tSuspicious Module: {module.FileName}" +
+                            $"\n\tFile Metadata: {metadata}" +
                             $"\n[!] Matched on: {edrstring}\n");
                         foundSuspiciousModule = true;
                     }
