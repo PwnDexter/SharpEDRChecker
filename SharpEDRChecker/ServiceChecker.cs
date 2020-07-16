@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Management;
 
 namespace SharpEDRChecker
@@ -23,7 +23,6 @@ namespace SharpEDRChecker
 
         private static bool CheckService(ManagementBaseObject service)
         {
-            bool foundSuspiciousService = false;
             var serviceName = service["Name"];
             var serviceDisplayName = service["DisplayName"];
             var serviceDescription = service["Description"];
@@ -47,24 +46,29 @@ namespace SharpEDRChecker
                 allattribs = $"{allattribs} - {metadata}";
             }
 
+            var matches = new List<string>();
             foreach (var edrstring in EDRData.edrlist)
             {
                 if (allattribs.ToLower().Contains(edrstring.ToLower()))
                 {
-                    Console.WriteLine($"[-] Suspicious service found:" +
-                        $"\n\tName: {serviceName}" +
-                        $"\n\tDisplayName: {serviceDisplayName}" +
-                        $"\n\tDescription: {serviceDescription}" +
-                        $"\n\tCaption: {serviceCaption}" +
-                        $"\n\tBinary: {servicePathName}" +
-                        $"\n\tStatus: {serviceState}" +
-                        $"\n\tProcess ID: {servicePID}" +
-                        $"\n\tFile Metadata: {metadata}" +
-                        $"\n[!] Matched on: {edrstring}\n");
-                    foundSuspiciousService = true;
+                    matches.Add(edrstring);
                 }
             }
-            return foundSuspiciousService;
+            if(matches.Count > 0)
+            {
+                Console.WriteLine($"[-] Suspicious service found:" +
+                       $"\n\tName: {serviceName}" +
+                       $"\n\tDisplayName: {serviceDisplayName}" +
+                       $"\n\tDescription: {serviceDescription}" +
+                       $"\n\tCaption: {serviceCaption}" +
+                       $"\n\tBinary: {servicePathName}" +
+                       $"\n\tStatus: {serviceState}" +
+                       $"\n\tProcess ID: {servicePID}" +
+                       $"\n\tFile Metadata: {metadata}" +
+                       $"\n[!] Matched on: {string.Join(", ", matches)}\n");
+                return true;
+            }
+            return false;
         }
     }
 }
