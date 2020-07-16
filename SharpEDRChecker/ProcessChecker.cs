@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Management;
 
 namespace SharpEDRChecker
@@ -94,7 +95,23 @@ namespace SharpEDRChecker
 
         private static string GetFileInfo(string filePath)
         {
-            var fileVersionInfo = FileVersionInfo.GetVersionInfo(filePath.ToString());
+            FileVersionInfo fileVersionInfo;
+            try
+            {
+                fileVersionInfo = FileVersionInfo.GetVersionInfo(filePath);
+            }
+            catch(FileNotFoundException e)
+            {
+                if (filePath.ToLower().StartsWith(@"c:\windows\system32\"))
+                {
+                    filePath = filePath.ToLower().Replace(@"c:\windows\system32\", @"C:\Windows\Sysnative\");
+                    fileVersionInfo = FileVersionInfo.GetVersionInfo(filePath);
+                }
+                else
+                {
+                    throw e;
+                }
+            }
             return $"\n \t\t Product Name: {fileVersionInfo.ProductName}" +
                 $"\n \t\t Filename: {fileVersionInfo.FileName}" +
                 $"\n \t\t Original Filename: {fileVersionInfo.OriginalFilename}" +

@@ -12,13 +12,13 @@ namespace SharpEDRChecker
     {
         [DllImport("psapi")]
         private static extern bool EnumDeviceDrivers(
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U4)][In][Out] uint[] ddAddresses,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U4)][In][Out] UIntPtr[] ddAddresses,
             uint arraySizeBytes,
             [MarshalAs(UnmanagedType.U4)] out uint bytesNeeded);
 
         [DllImport("psapi")]
         private static extern int GetDeviceDriverBaseName(
-            uint ddAddress,
+            UIntPtr ddAddress,
             StringBuilder ddBaseName,
             int baseNameStringSizeChars);
 
@@ -26,7 +26,7 @@ namespace SharpEDRChecker
         {
             uint arraySize;
             uint arraySizeBytes;
-            uint[] ddAddresses;
+            UIntPtr[] ddAddresses;
             uint bytesNeeded;
             bool success;
 
@@ -49,9 +49,9 @@ namespace SharpEDRChecker
                 return;
             }
             // Allocate the array; as each ID is a 4-byte int, it should be 1/4th the size of bytesNeeded
-            arraySize = bytesNeeded / (uint)IntPtr.Size;
+            arraySize = bytesNeeded / (uint)UIntPtr.Size;
             arraySizeBytes = bytesNeeded;
-            ddAddresses = new uint[arraySize];
+            ddAddresses = new UIntPtr[arraySize];
 
             // Now fill it
             success = EnumDeviceDrivers(ddAddresses, arraySizeBytes, out bytesNeeded);
@@ -68,7 +68,7 @@ namespace SharpEDRChecker
             for (int i = 0; i < arraySize; i++)
             {
                 // If the length of the device driver base name is over 1000 characters, good luck to it.  :-)
-                StringBuilder sb = new StringBuilder(2000);
+                StringBuilder sb = new StringBuilder(1000);
 
                 int result = GetDeviceDriverBaseName(ddAddresses[i], sb, sb.Capacity);
 
@@ -80,8 +80,8 @@ namespace SharpEDRChecker
                 else
                 {
                     Console.WriteLine("Device driver LoadAddress: " + ddAddresses[i] + ", BaseName: " + sb.ToString());
+                    Console.WriteLine($"DID IT WORK???? The action data I want but: {sb}");
                 }
-
             }
         }
     }
