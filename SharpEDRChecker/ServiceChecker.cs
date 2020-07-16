@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Management;
 
 namespace SharpEDRChecker
@@ -30,12 +31,21 @@ namespace SharpEDRChecker
             var servicePathName = service["PathName"];
             var serviceState = service["State"];
             var servicePID = service["ProcessId"];
+            var metadata = "";
 
             var allattribs = $"{serviceName} - " +
                 $"{serviceDisplayName} - " +
                 $"{serviceDescription} - " +
                 $"{serviceCaption} - " +
                 $"{servicePathName}";
+
+            if (servicePathName != null)
+            {
+                var indexOfExe = servicePathName.ToString().ToLower().IndexOf(".exe");
+                var filePath = servicePathName.ToString().Substring(0, indexOfExe + ".exe".Length).Trim('"');
+                metadata = $"{FileChecker.GetFileInfo(filePath)}";
+                allattribs = $"{allattribs} - {metadata}";
+            }
 
             foreach (var edrstring in EDRData.edrlist)
             {
@@ -49,6 +59,7 @@ namespace SharpEDRChecker
                         $"\n\tBinary: {servicePathName}" +
                         $"\n\tStatus: {serviceState}" +
                         $"\n\tProcess ID: {servicePID}" +
+                        $"\n\tFile Metadata: {metadata}" +
                         $"\n[!] Matched on: {edrstring}\n");
                     foundSuspiciousService = true;
                 }

@@ -86,6 +86,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileChecker.cs" />
     <Compile Include="DirectoryChecker.cs" />
     <Compile Include="DriverChecker.cs" />
     <Compile Include="EDRData.cs" />

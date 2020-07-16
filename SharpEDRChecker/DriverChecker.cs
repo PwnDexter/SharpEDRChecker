@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Management;
-using System.Diagnostics;
-using System.ServiceProcess;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.CodeDom;
 
 namespace SharpEDRChecker
 {
@@ -18,6 +14,12 @@ namespace SharpEDRChecker
 
         [DllImport("psapi")]
         private static extern int GetDeviceDriverBaseName(
+            UIntPtr ddAddress,
+            StringBuilder ddBaseName,
+            int baseNameStringSizeChars);
+
+        [DllImport("psapi")]
+        private static extern int GetDeviceDriverFileName(
             UIntPtr ddAddress,
             StringBuilder ddBaseName,
             int baseNameStringSizeChars);
@@ -68,20 +70,31 @@ namespace SharpEDRChecker
             for (int i = 0; i < arraySize; i++)
             {
                 // If the length of the device driver base name is over 1000 characters, good luck to it.  :-)
-                StringBuilder sb = new StringBuilder(1000);
+                StringBuilder driverFilePathsb = new StringBuilder(1000);
+                StringBuilder driverBaseNamesb = new StringBuilder(1000);
 
-                int result = GetDeviceDriverBaseName(ddAddresses[i], sb, sb.Capacity);
+                int result = GetDeviceDriverFileName(ddAddresses[i], driverFilePathsb, driverFilePathsb.Capacity);
 
                 if(result == 0)
                 {
                     int error = Marshal.GetLastWin32Error();
                     Console.WriteLine("The last Win32 Error was: " + error);
+                    continue;
                 }
-                else
+
+                result = GetDeviceDriverBaseName(ddAddresses[i], driverBaseNamesb, driverBaseNamesb.Capacity);
+
+                if (result == 0)
                 {
-                    Console.WriteLine("Device driver LoadAddress: " + ddAddresses[i] + ", BaseName: " + sb.ToString());
-                    Console.WriteLine($"DID IT WORK???? The action data I want but: {sb}");
+                    int error = Marshal.GetLastWin32Error();
+                    Console.WriteLine("The last Win32 Error was: " + error);
+                    continue;
                 }
+                var driverFileName = driverFilePathsb.ToString();
+                var driverBaseName = driverBaseNamesb.ToString();
+
+                //FROM HERE
+
             }
         }
     }

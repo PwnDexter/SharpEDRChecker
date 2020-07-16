@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Management;
 
 namespace SharpEDRChecker
@@ -42,7 +41,7 @@ namespace SharpEDRChecker
 
             if (processPath != null)
             {
-                metadata = $"{GetFileInfo(processPath.ToString())}";
+                metadata = $"{FileChecker.GetFileInfo(processPath.ToString())}";
                 allattribs = $"{allattribs} - {metadata}";
             }
 
@@ -58,7 +57,7 @@ namespace SharpEDRChecker
                         $"\n\tProcess ID: {processPID}" +
                         $"\n\tParent Process: {processParent}" +
                         $"\n\tProcess CmdLine: {processCmdLine}" +
-                        $"\n\tMetadata: {metadata}" +
+                        $"\n\tFile Metadata: {metadata}" +
                         $"\n[!] Matched on: {edrstring}\n");
                     foundSuspiciousProcess = true;
                 }
@@ -73,8 +72,8 @@ namespace SharpEDRChecker
             bool foundSuspiciousModule = false;
             foreach (ProcessModule module in myproc.Modules)
             {
-                var allattribs = $"{module.FileName} - {GetFileInfo(module.FileName)}";
-                var metadata = $"{GetFileInfo(module.FileName)}";
+                var allattribs = $"{module.FileName} - {FileChecker.GetFileInfo(module.FileName)}";
+                var metadata = $"{FileChecker.GetFileInfo(module.FileName)}";
 
                 foreach (var edrstring in EDRData.edrlist)
                 {
@@ -91,37 +90,6 @@ namespace SharpEDRChecker
             {
                 Console.WriteLine("[+] No suspicious modules found in your process\n");
             }
-        }
-
-        private static string GetFileInfo(string filePath)
-        {
-            FileVersionInfo fileVersionInfo;
-            try
-            {
-                fileVersionInfo = FileVersionInfo.GetVersionInfo(filePath);
-            }
-            catch(FileNotFoundException e)
-            {
-                if (filePath.ToLower().StartsWith(@"c:\windows\system32\"))
-                {
-                    filePath = filePath.ToLower().Replace(@"c:\windows\system32\", @"C:\Windows\Sysnative\");
-                    fileVersionInfo = FileVersionInfo.GetVersionInfo(filePath);
-                }
-                else
-                {
-                    throw e;
-                }
-            }
-            return $"\n \t\t Product Name: {fileVersionInfo.ProductName}" +
-                $"\n \t\t Filename: {fileVersionInfo.FileName}" +
-                $"\n \t\t Original Filename: {fileVersionInfo.OriginalFilename}" +
-                $"\n \t\t Internal Name: {fileVersionInfo.InternalName}" +
-                $"\n \t\t Company Name: {fileVersionInfo.CompanyName}" +
-                $"\n \t\t File Description: {fileVersionInfo.FileDescription}" +
-                $"\n \t\t Product Version: {fileVersionInfo.ProductVersion}" +
-                $"\n \t\t Comments: {fileVersionInfo.Comments}" +
-                $"\n \t\t Legal Copyright: {fileVersionInfo.LegalCopyright}" +
-                $"\n \t\t Legal Trademarks: {fileVersionInfo.LegalTrademarks}";
         }
     }
 }
