@@ -9,15 +9,21 @@ namespace SharpEDRChecker
         internal static void CheckServices()
         {
             Console.WriteLine("[!] Checking Services...");
-            var serviceList = new ManagementObjectSearcher("Select * From Win32_Service").Get();
-            bool foundSuspiciousService = false;
-            foreach (var service in serviceList)
+            try
             {
-                foundSuspiciousService = CheckService(service) || foundSuspiciousService;
-            }
-            if (!foundSuspiciousService)
+                var serviceList = new ManagementObjectSearcher("Select * From Win32_Service").Get();
+                bool foundSuspiciousService = false;
+                foreach (var service in serviceList)
+                {
+                    foundSuspiciousService = CheckService(service) || foundSuspiciousService;
+                }
+                if (!foundSuspiciousService)
+                {
+                    Console.WriteLine("[+] No suspicious services found\n");
+                }
+            } catch (Exception e)
             {
-                Console.WriteLine("[+] No suspicious services found\n");
+                Console.WriteLine($"*** Errored on services: {e}");
             }
         }
 
