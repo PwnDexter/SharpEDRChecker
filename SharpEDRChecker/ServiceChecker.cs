@@ -54,7 +54,7 @@ namespace SharpEDRChecker
                     matches.Add(edrstring);
                 }
             }
-            if(matches.Count > 0)
+            if (matches.Count > 0)
             {
                 Console.WriteLine($"[-] Suspicious service found:" +
                        $"\n\tName: {serviceName}" +

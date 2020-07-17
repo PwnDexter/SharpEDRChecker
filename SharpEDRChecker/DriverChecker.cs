@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -75,7 +77,7 @@ namespace SharpEDRChecker
 
                 int result = GetDeviceDriverFileName(ddAddresses[i], driverFilePathsb, driverFilePathsb.Capacity);
 
-                if(result == 0)
+                if (result == 0)
                 {
                     int error = Marshal.GetLastWin32Error();
                     Console.WriteLine("The last Win32 Error was: " + error);
@@ -90,11 +92,41 @@ namespace SharpEDRChecker
                     Console.WriteLine("The last Win32 Error was: " + error);
                     continue;
                 }
-                var driverFileName = driverFilePathsb.ToString();
-                var driverBaseName = driverBaseNamesb.ToString();
 
                 //FROM HERE
+                //Console.WriteLine("[!] Checking drivers...");
+                var driverFileName = driverFilePathsb.ToString();
+                var driverBaseName = driverBaseNamesb.ToString();
+                bool foundSuspiciousModule = false;
+                //Console.WriteLine($"THE DRIVER FILE NAME IS: {driverFileName}");
 
+                var indexOfPath = driverFileName.ToLower().Replace(@"\systemroot\".ToLower(), @"c:\windows\".ToLower());
+                //var fixOfPath = indexOfPath.ToLower().Replace(@"c:\windows\sysnative\".ToLower(), @"c:\windows\system32\".ToLower());
+                var filePath = indexOfPath.ToString().ToLower();
+                //Console.WriteLine($"SHOW ME : {filePath}");
+                //var allattribs = $"{driverBaseName} - {FileChecker.GetFileInfo(filePath.ToString())}";
+                var metadata = $"{FileChecker.GetFileInfo(filePath.ToString())}";
+
+                var matches = new List<string>();
+                foreach (var edrstring in EDRData.edrlist)
+                {
+                    if (metadata.ToString().ToLower().Contains(edrstring.ToLower()))
+                    {
+                        matches.Add(edrstring);
+                    }
+                }
+                if (matches.Count > 0)
+                {
+                    Console.WriteLine("[-] Suspicious driver found:" +
+                                $"\n\tSuspicious Module: {driverBaseName}" +
+                                $"\n\tFile Metadata: {metadata}" +
+                                $"\n[!] Matched on: {string.Join(", ", matches)}\n");
+                    foundSuspiciousModule = true;
+                }
+                if (!foundSuspiciousModule)
+                {
+                    Console.WriteLine("[+] No suspicious drivers found\n");
+                }
             }
         }
     }

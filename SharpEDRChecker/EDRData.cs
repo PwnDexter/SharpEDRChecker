@@ -7,6 +7,7 @@
         {
                 "activeconsole",
                 "amsi.dll",
+                "anti-malware",
                 "authtap",
                 "avast",
                 "avecto",

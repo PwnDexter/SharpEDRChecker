@@ -80,18 +80,23 @@ namespace SharpEDRChecker
                 var allattribs = $"{module.FileName} - {FileChecker.GetFileInfo(module.FileName)}";
                 var metadata = $"{FileChecker.GetFileInfo(module.FileName)}";
 
+                var matches = new List<string>();
                 foreach (var edrstring in EDRData.edrlist)
                 {
-                    if (module.ToString().ToLower().Contains(edrstring.ToLower()))
+                    if (allattribs.ToString().ToLower().Contains(edrstring.ToLower()))
+                    {
+                        matches.Add(edrstring);
+                    }
+                }
+                if (matches.Count > 0)
                     {
                         Console.WriteLine("[-] Suspicious modload found in your process:" +
-                            $"\n\tSuspicious Module: {module.FileName}" +
-                            $"\n\tFile Metadata: {metadata}" +
-                            $"\n[!] Matched on: {edrstring}\n");
+                                    $"\n\tSuspicious Module: {module.FileName}" +
+                                    $"\n\tFile Metadata: {metadata}" +
+                                    $"\n[!] Matched on: {string.Join(", ", matches)}\n");
                         foundSuspiciousModule = true;
                     }
                 }
-            }
             if (!foundSuspiciousModule)
             {
                 Console.WriteLine("[+] No suspicious modules found in your process\n");
