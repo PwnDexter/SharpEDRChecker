@@ -4,7 +4,7 @@ namespace SharpEDRChecker
 {
     class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
             bool isAdm = PrivilegeChecker.PrivCheck();
             PrintIntro(isAdm);
