@@ -32,7 +32,6 @@ namespace SharpEDRChecker
         private static void PrintOutro()
         {
             Console.WriteLine("[!] EDR Checks Complete\n");
-            Console.WriteLine("[!] TLDR:\n");
         }
     }
 }
