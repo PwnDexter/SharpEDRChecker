@@ -23,7 +23,7 @@ namespace SharpEDRChecker
                 }
             } catch (Exception e)
             {
-                Console.WriteLine($"*** Errored on services: {e}");
+                Console.WriteLine($"[-] Errored on getting services: {e}");
             }
         }
 
