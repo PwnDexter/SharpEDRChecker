@@ -6,7 +6,7 @@ namespace SharpEDRChecker
 {
     internal class ServiceChecker
     {
-        internal static void CheckServices()
+        internal static string CheckServices()
         {
             Console.WriteLine("[!] Checking Services...");
             try
@@ -21,10 +21,12 @@ namespace SharpEDRChecker
                 {
                     Console.WriteLine("[+] No suspicious services found\n");
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on getting services: {e}");
             }
+            return "<Service Summary>";
         }
 
         private static bool CheckService(ManagementBaseObject service)

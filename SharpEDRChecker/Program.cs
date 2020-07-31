@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SharpEDRChecker
 {
@@ -6,14 +7,26 @@ namespace SharpEDRChecker
     {
         static void Main(string[] args)
         {
-            bool isAdm = PrivilegeChecker.PrivCheck();
-            PrintIntro(isAdm);
-            ProcessChecker.CheckProcesses();
-            ProcessChecker.CheckCurrentProcessModules();
-            DirectoryChecker.CheckDirectories();
-            ServiceChecker.CheckServices();
-            DriverChecker.CheckDrivers();
-            PrintOutro();
+            try
+            {
+                bool isAdm = PrivilegeChecker.PrivCheck();
+                PrintIntro(isAdm);
+                var summary = ProcessChecker.CheckProcesses();
+                summary += ProcessChecker.CheckCurrentProcessModules();
+                summary += DirectoryChecker.CheckDirectories();
+                summary += ServiceChecker.CheckServices();
+                summary += DriverChecker.CheckDrivers();
+                PrintOutro(summary);
+#if DEBUG
+                Console.WriteLine("Press Enter to continue...");
+                Console.ReadLine();
+#endif
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[-] Error running SharpEDRChecker: " + e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
         }
 
         private static void PrintIntro(bool isAdm)
@@ -29,8 +42,9 @@ namespace SharpEDRChecker
             }
         }
 
-        private static void PrintOutro()
+        private static void PrintOutro(string summary)
         {
+            Console.WriteLine($"[!] The tldr is: {summary}\n");
             Console.WriteLine("[!] EDR Checks Complete\n");
         }
     }

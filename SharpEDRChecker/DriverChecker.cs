@@ -25,63 +25,85 @@ namespace SharpEDRChecker
             StringBuilder ddBaseName,
             int baseNameStringSizeChars);
 
-        internal static void CheckDrivers()
+        internal static string CheckDrivers()
         {
-            uint numberOfDrivers;
-            UIntPtr[] driverAddresses;
-
-            uint sizeOfDriverArrayInBytes = GetSizeOfDriversArray();
-            if (sizeOfDriverArrayInBytes == 0)
+            try
             {
-                Console.WriteLine("[!] Error getting driver array size");
-                return;
+                uint numberOfDrivers;
+                UIntPtr[] driverAddresses;
+
+                uint sizeOfDriverArrayInBytes = GetSizeOfDriversArray();
+                if (sizeOfDriverArrayInBytes == 0)
+                {
+                    Console.WriteLine("[!] Error getting driver array size");
+                    return "[-] Driver checks errored";
+                }
+
+                uint sizeOfOneDriverAddress = (uint)UIntPtr.Size;
+                numberOfDrivers = sizeOfDriverArrayInBytes / sizeOfOneDriverAddress;
+                driverAddresses = new UIntPtr[numberOfDrivers];
+
+                bool success = EnumDeviceDrivers(driverAddresses, sizeOfDriverArrayInBytes, out sizeOfDriverArrayInBytes);
+
+                if (!success)
+                {
+                    Console.WriteLine("[-] Call to EnumDeviceDrivers failed!");
+                    int error = Marshal.GetLastWin32Error();
+                    Console.WriteLine("[-] The last Win32 Error was: " + error);
+                    return "[-] Driver checks errored";
+                }
+
+                bool foundSuspiciousDriver = IterateOverDrivers(numberOfDrivers, driverAddresses);
+
+                if (!foundSuspiciousDriver)
+                {
+                    Console.WriteLine("[+] No suspicious drivers found\n");
+                }
+                return "<Driver summary>";
             }
-
-            uint sizeOfOneDriverAddress = (uint)UIntPtr.Size;
-            numberOfDrivers = sizeOfDriverArrayInBytes / sizeOfOneDriverAddress;
-            driverAddresses = new UIntPtr[numberOfDrivers];
-
-            bool success = EnumDeviceDrivers(driverAddresses, sizeOfDriverArrayInBytes, out sizeOfDriverArrayInBytes);
-
-            if (!success)
+            catch (Exception e)
             {
-                Console.WriteLine("[-] Call to EnumDeviceDrivers failed!");
-                int error = Marshal.GetLastWin32Error();
-                Console.WriteLine("[-] The last Win32 Error was: " + error);
-                return;
-            }
-
-            bool foundSuspiciousDriver = IterateOverDrivers(numberOfDrivers, driverAddresses);
-
-            if (!foundSuspiciousDriver)
-            {
-                Console.WriteLine("[+] No suspicious drivers found\n");
+                Console.WriteLine($"[-] Errored on getting drivers: {e.Message}\n{e.StackTrace}");
+                return "[-] Driver checks errored";
             }
         }
 
         internal static bool CheckDriver(string driverFileName, string driverBaseName)
         {
-            var fixedDriverPath = driverFileName.ToLower().Replace(@"\systemroot\".ToLower(), @"c:\windows\".ToLower());
-            var metadata = $"{FileChecker.GetFileInfo(fixedDriverPath)}";
-            var allattribs = $"{driverBaseName} - {metadata}";
-
-            var matches = new List<string>();
-            foreach (var edrstring in EDRData.edrlist)
+            try
             {
-                if (allattribs.ToString().ToLower().Contains(edrstring.ToLower()))
+                var fixedDriverPath = driverFileName.ToLower().Replace(@"\systemroot\".ToLower(), @"c:\windows\".ToLower());
+                if (fixedDriverPath.StartsWith(@"\windows\"))
                 {
-                    matches.Add(edrstring);
+                    fixedDriverPath = fixedDriverPath.Replace(@"\windows\".ToLower(), @"c:\windows\".ToLower());
                 }
+                var metadata = $"{FileChecker.GetFileInfo(fixedDriverPath)}";
+                var allattribs = $"{driverBaseName} - {metadata}";
+
+                var matches = new List<string>();
+                foreach (var edrstring in EDRData.edrlist)
+                {
+                    if (allattribs.ToString().ToLower().Contains(edrstring.ToLower()))
+                    {
+                        matches.Add(edrstring);
+                    }
+                }
+                if (matches.Count > 0)
+                {
+                    Console.WriteLine("[-] Suspicious driver found:" +
+                                $"\n\tSuspicious Module: {driverBaseName}" +
+                                $"\n\tFile Metadata: {metadata}" +
+                                $"\n[!] Matched on: {string.Join(", ", matches)}\n");
+                    return true;
+                }
+                return false;
             }
-            if (matches.Count > 0)
+            catch (Exception e)
             {
-                Console.WriteLine("[-] Suspicious driver found:" +
-                            $"\n\tSuspicious Module: {driverBaseName}" +
-                            $"\n\tFile Metadata: {metadata}" +
-                            $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                return true;
+                Console.WriteLine($"[-] Errored on getting driver {driverBaseName} {driverFileName}: {e.Message}");
+                Console.WriteLine(e.StackTrace);
+                return false;
             }
-            return false;
         }
 
         private static bool IterateOverDrivers(uint arraySize, UIntPtr[] ddAddresses)

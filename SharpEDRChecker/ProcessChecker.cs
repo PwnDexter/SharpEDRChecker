@@ -7,22 +7,24 @@ namespace SharpEDRChecker
 {
     internal class ProcessChecker
     {
-        internal static void CheckProcesses()
+        internal static string CheckProcesses()
         {
             Console.WriteLine("[!] Checking processes...");
             var processList = new ManagementObjectSearcher("Select * From Win32_Process").Get();
-            bool foundSuspiciousProcess = false;
+            string summary = "";
             foreach (var process in processList)
             {
-                foundSuspiciousProcess = CheckProcess(process) || foundSuspiciousProcess;
+                summary += CheckProcess(process);
             }
-            if (!foundSuspiciousProcess)
+            if (string.IsNullOrEmpty(summary))
             {
                 Console.WriteLine("[+] No suspicious processes found\n");
+                return "\n[+] No suspicious processes found\n";
             }
+            return $"\nProcess Summary: \n{summary}\n";
         }
 
-        private static bool CheckProcess(ManagementBaseObject process)
+        private static string CheckProcess(ManagementBaseObject process)
         {
             var processName = process["Name"];
             var processPath = process["ExecutablePath"];
@@ -65,12 +67,12 @@ namespace SharpEDRChecker
                             $"\n\tProcess CmdLine: {processCmdLine}" +
                             $"\n\tFile Metadata: {metadata}" +
                             $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                return true;
+                return $"\t{processName} : {string.Join(", ", matches)}\n";
             }
-            return false;
+            return "";
         }
 
-        internal static void CheckCurrentProcessModules()
+        internal static string CheckCurrentProcessModules()
         {
             Console.WriteLine("[!] Checking modules loaded in your current process...");
             Process myproc = Process.GetCurrentProcess();
@@ -101,6 +103,7 @@ namespace SharpEDRChecker
             {
                 Console.WriteLine("[+] No suspicious modules found in your process\n");
             }
+            return "<Process Module Summary>";
         }
     }
 }

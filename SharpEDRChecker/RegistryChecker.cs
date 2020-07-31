@@ -4,7 +4,7 @@ namespace SharpEDRChecker
 {
     internal class RegistryChecker
     {
-        internal static void CheckRegistry()
+        internal static string CheckRegistry()
         {
             throw new NotImplementedException("Checking Registry Not Implemented");
         }
