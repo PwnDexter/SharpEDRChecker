@@ -12,15 +12,17 @@ namespace SharpEDRChecker
             try
             {
                 var serviceList = new ManagementObjectSearcher("Select * From Win32_Service").Get();
-                bool foundSuspiciousService = false;
+                string summary = "";
                 foreach (var service in serviceList)
                 {
-                    foundSuspiciousService = CheckService(service) || foundSuspiciousService;
+                    summary += CheckService(service);
                 }
-                if (!foundSuspiciousService)
+                if (string.IsNullOrEmpty(summary))
                 {
                     Console.WriteLine("[+] No suspicious services found\n");
+                    return "\n[+] No suspicious services found\n";
                 }
+                return $"\nService Summary: \n{summary}\n";
             }
             catch (Exception e)
             {
@@ -29,7 +31,7 @@ namespace SharpEDRChecker
             return "<Service Summary>";
         }
 
-        private static bool CheckService(ManagementBaseObject service)
+        private static string CheckService(ManagementBaseObject service)
         {
             var serviceName = service["Name"];
             var serviceDisplayName = service["DisplayName"];
@@ -74,9 +76,9 @@ namespace SharpEDRChecker
                        $"\n\tProcess ID: {servicePID}" +
                        $"\n\tFile Metadata: {metadata}" +
                        $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                return true;
+                return $"\t{serviceName} : {string.Join(", ", matches)}\n";
             }
-            return false;
+            return "";
         }
     }
 }

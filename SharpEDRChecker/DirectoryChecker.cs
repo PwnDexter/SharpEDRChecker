@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace SharpEDRChecker
@@ -19,14 +20,19 @@ namespace SharpEDRChecker
                 string[] subdirectories = Directory.GetDirectories(dir);
                 foreach (var subdirectory in subdirectories)
                 {
+                    var matches = new List<string>();
                     foreach (var edrstring in EDRData.edrlist)
                     {
                         if (subdirectory.ToString().ToLower().Contains(edrstring.ToLower()))
                         {
-                            Console.WriteLine($"[-] Suspicious directory found: {subdirectory}");
-                            Console.WriteLine($"[!] Matched on: {edrstring}\n");
-                            foundSuspiciousDirectory = true;
+                            matches.Add(edrstring);
                         }
+                    }
+                    if (matches.Count > 0)
+                    {
+                        Console.WriteLine($"[-] Suspicious directory found: {subdirectory}");
+                        Console.WriteLine($"[!] Matched on: {string.Join(", ", matches)}\n");
+                        foundSuspiciousDirectory = true;
                     }
                 }
             }
