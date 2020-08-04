@@ -36,7 +36,7 @@ namespace SharpEDRChecker
                 if (sizeOfDriverArrayInBytes == 0)
                 {
                     Console.WriteLine("[!] Error getting driver array size");
-                    return "[-] Driver checks errored";
+                    return "\n[-] Driver checks errored\n";
                 }
 
                 uint sizeOfOneDriverAddress = (uint)UIntPtr.Size;
@@ -50,16 +50,17 @@ namespace SharpEDRChecker
                     Console.WriteLine("[-] Call to EnumDeviceDrivers failed!");
                     int error = Marshal.GetLastWin32Error();
                     Console.WriteLine("[-] The last Win32 Error was: " + error);
-                    return "[-] Driver checks errored";
+                    return "\n[-] Driver checks errored\n";
                 }
 
-                bool foundSuspiciousDriver = IterateOverDrivers(numberOfDrivers, driverAddresses);
+                var summary = IterateOverDrivers(numberOfDrivers, driverAddresses);
 
-                if (!foundSuspiciousDriver)
+                if (string.IsNullOrEmpty(summary))
                 {
                     Console.WriteLine("[+] No suspicious drivers found\n");
+                    return "\nNo suspicious drivers found\n";
                 }
-                return "<Driver summary>";
+                return $"\nDriver Summary: \n{summary}\n";
             }
             catch (Exception e)
             {
@@ -68,7 +69,20 @@ namespace SharpEDRChecker
             }
         }
 
-        internal static bool CheckDriver(string driverFileName, string driverBaseName)
+        private static string IterateOverDrivers(uint arraySize, UIntPtr[] ddAddresses)
+        {
+            var summary = "";
+            Console.WriteLine("[!] Checking drivers...");
+            for (int i = 0; i < arraySize; i++)
+            {
+                var driverFileName = GetDriverFileName(ddAddresses[i]);
+                var driverBaseName = GetDriverBaseName(ddAddresses[i]);
+                summary += CheckDriver(driverFileName, driverBaseName);
+            }
+            return summary;
+        }
+
+        internal static string CheckDriver(string driverFileName, string driverBaseName)
         {
             try
             {
@@ -94,29 +108,15 @@ namespace SharpEDRChecker
                                 $"\n\tSuspicious Module: {driverBaseName}" +
                                 $"\n\tFile Metadata: {metadata}" +
                                 $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                    return true;
+                    return $"\t{driverBaseName} : {string.Join(", ", matches)}\n";
                 }
-                return false;
+                return "";
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[-] Errored on getting driver {driverBaseName} {driverFileName}: {e.Message}");
-                Console.WriteLine(e.StackTrace);
-                return false;
+                Console.WriteLine($"[-] Errored on getting driver {driverBaseName} {driverFileName}: {e.Message}\n{e.StackTrace}");
+                return $"\t{driverBaseName} : Failed to perform checks\n";
             }
-        }
-
-        private static bool IterateOverDrivers(uint arraySize, UIntPtr[] ddAddresses)
-        {
-            bool foundSuspiciousDriver = false;
-            Console.WriteLine("[!] Checking drivers...");
-            for (int i = 0; i < arraySize; i++)
-            {
-                var driverFileName = GetDriverFileName(ddAddresses[i]);
-                var driverBaseName = GetDriverBaseName(ddAddresses[i]);
-                foundSuspiciousDriver = CheckDriver(driverFileName, driverBaseName) || foundSuspiciousDriver;
-            }
-            return foundSuspiciousDriver;
         }
 
         private static string GetDriverBaseName(UIntPtr driverAddress)

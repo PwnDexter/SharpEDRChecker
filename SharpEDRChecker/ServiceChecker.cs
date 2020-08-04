@@ -27,8 +27,8 @@ namespace SharpEDRChecker
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on getting services: {e}");
+                return "[-] Errored on getting services";
             }
-            return "<Service Summary>";
         }
 
         private static string CheckService(ManagementBaseObject service)

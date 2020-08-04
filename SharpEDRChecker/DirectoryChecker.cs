@@ -8,39 +8,69 @@ namespace SharpEDRChecker
     {
         internal static string CheckDirectories()
         {
-            Console.WriteLine("[!] Checking Directories...");
-            bool foundSuspiciousDirectory = false;
-            string[] progdirs = {
+            try
+            {
+                Console.WriteLine("[!] Checking Directories...");
+                string summary = "";
+                string[] progdirs = {
                 @"C:\Program Files",
                 @"C:\Program Files (x86)",
                 @"C:\ProgramData"};
 
-            foreach (string dir in progdirs)
-            {
-                string[] subdirectories = Directory.GetDirectories(dir);
-                foreach (var subdirectory in subdirectories)
+                foreach (string dir in progdirs)
                 {
-                    var matches = new List<string>();
-                    foreach (var edrstring in EDRData.edrlist)
+                    string[] subdirectories = Directory.GetDirectories(dir);
+                    summary += CheckDirectory(subdirectories);
+                }
+                if (string.IsNullOrEmpty(summary))
+                {
+                    Console.WriteLine("[+] No suspicious directories found\n");
+                    return "\n[+] No suspicious directories found\n";
+                }
+                return $"\nDirectory Summary: \n{summary}\n";
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[-] Errored on getting directories: {e}");
+                return "[-] Errored on getting directories";
+            }
+        }
+
+        private static string CheckDirectory(string[] subdirectories)
+        {
+            var summary = "";
+            foreach (var subdirectory in subdirectories)
+            {
+                summary += CheckSubDirectory(subdirectory);  
+            }
+            return summary;
+        }
+
+        private static string CheckSubDirectory(string subdirectory)
+        {
+            try
+            {
+                var matches = new List<string>();
+                foreach (var edrstring in EDRData.edrlist)
+                {
+                    if (subdirectory.ToString().ToLower().Contains(edrstring.ToLower()))
                     {
-                        if (subdirectory.ToString().ToLower().Contains(edrstring.ToLower()))
-                        {
-                            matches.Add(edrstring);
-                        }
-                    }
-                    if (matches.Count > 0)
-                    {
-                        Console.WriteLine($"[-] Suspicious directory found: {subdirectory}");
-                        Console.WriteLine($"[!] Matched on: {string.Join(", ", matches)}\n");
-                        foundSuspiciousDirectory = true;
+                        matches.Add(edrstring);
                     }
                 }
-            }
-            if (!foundSuspiciousDirectory)
+                if (matches.Count > 0)
+                {
+                    Console.WriteLine($"[-] Suspicious directory found: {subdirectory}");
+                    Console.WriteLine($"[!] Matched on: {string.Join(", ", matches)}\n");
+                    return $"\t{subdirectory} : {string.Join(", ", matches)}\n";
+                }
+                return "";
+            } 
+            catch (Exception e)
             {
-                Console.WriteLine("[+] No suspicious directories found\n");
+                Console.WriteLine($"Errored: {e}");
+                return "Errored";
             }
-            return "<Directory summary>";
         }
     }
 }
