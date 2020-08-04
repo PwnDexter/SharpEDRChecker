@@ -76,7 +76,7 @@ namespace SharpEDRChecker
         {
             Console.WriteLine("[!] Checking modules loaded in your current process...");
             Process myproc = Process.GetCurrentProcess();
-            bool foundSuspiciousModule = false;
+            var summary = "";
             foreach (ProcessModule module in myproc.Modules)
             {
                 var allattribs = $"{module.FileName} - {FileChecker.GetFileInfo(module.FileName)}";
@@ -91,19 +91,20 @@ namespace SharpEDRChecker
                     }
                 }
                 if (matches.Count > 0)
-                    {
-                        Console.WriteLine("[-] Suspicious modload found in your process:" +
-                                    $"\n\tSuspicious Module: {module.FileName}" +
-                                    $"\n\tFile Metadata: {metadata}" +
-                                    $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                        foundSuspiciousModule = true;
-                    }
+                {
+                    Console.WriteLine("[-] Suspicious modload found in your process:" +
+                                $"\n\tSuspicious Module: {module.FileName}" +
+                                $"\n\tFile Metadata: {metadata}" +
+                                $"\n[!] Matched on: {string.Join(", ", matches)}\n");
+                    summary += $"\t{module.FileName} : {string.Join(", ", matches)}\n";
                 }
-            if (!foundSuspiciousModule)
+            }
+            if (string.IsNullOrEmpty(summary))
             {
                 Console.WriteLine("[+] No suspicious modules found in your process\n");
+                return "\n[+] No suspicious modules found in your process\n";
             }
-            return "<Process Module Summary>";
+            return $"\nModload Summary: \n{summary}\n";
         }
     }
 }
