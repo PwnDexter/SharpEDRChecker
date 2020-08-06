@@ -29,7 +29,7 @@ namespace SharpEDRChecker
                     Console.WriteLine("[+] No suspicious directories found\n");
                     return "\n[+] No suspicious directories found\n";
                 }
-                return $"[!] Directory Summary: \n{summary}\n";
+                return $"\n[!] Directory Summary: \n{summary}\n";
             }
             catch (Exception e)
             {

@@ -32,7 +32,7 @@ namespace SharpEDRChecker
                 }
                 else
                 {
-                    Console.WriteLine($"[-] Could not get file info for: {filePath}\n");
+                    Console.WriteLine($"[!] Could not get file info for: {filePath}\n");
                     return "";
                 }
             }

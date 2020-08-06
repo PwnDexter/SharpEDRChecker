@@ -33,14 +33,14 @@ namespace SharpEDRChecker
             if (isAdm)
             {
                 Console.WriteLine($"\n##################################################################");
-                Console.WriteLine("     [!][!][!] Welcome to EDRChecker by @PwnDexter [!][!][!]");
+                Console.WriteLine("   [!][!][!] Welcome to SharpEDRChecker by @PwnDexter [!][!][!]");
                 Console.WriteLine("[+][+][+] Running as admin, all checks will be performed [+][+][+]");
                 Console.WriteLine($"##################################################################\n");
             }
             else
             {
                 Console.WriteLine($"\n###################################################################################################");
-                Console.WriteLine("                      [!][!][!] Welcome to EDRChecker by @PwnDexter [!][!][!]");
+                Console.WriteLine("                    [!][!][!] Welcome to SharpEDRChecker by @PwnDexter [!][!][!]");
                 Console.WriteLine("[-][-][-] Not running as admin, some privileged metadata and processes may not be checked [-][-][-]");
                 Console.WriteLine($"###################################################################################################\n");
             }

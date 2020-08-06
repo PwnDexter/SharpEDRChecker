@@ -61,9 +61,9 @@ namespace SharpEDRChecker
                 if (string.IsNullOrEmpty(summary))
                 {
                     Console.WriteLine("[+] No suspicious drivers found\n");
-                    return "\nNo suspicious drivers found\n";
+                    return "\n[+] No suspicious drivers found\n";
                 }
-                return $"[!] Driver Summary: \n{summary}";
+                return $"\n[!] Driver Summary: \n{summary}";
             }
             catch (Exception e)
             {
@@ -117,7 +117,7 @@ namespace SharpEDRChecker
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on checking driver {driverBaseName} : {driverFileName}\n{e.Message}\n{e.StackTrace}");
-                return $"\t{driverBaseName} : Failed to perform checks\n";
+                return $"\t[-] {driverBaseName} : Failed to perform checks\n";
             }
         }
 

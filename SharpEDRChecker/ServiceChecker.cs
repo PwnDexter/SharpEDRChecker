@@ -24,7 +24,7 @@ namespace SharpEDRChecker
                     Console.WriteLine("[+] No suspicious services found\n");
                     return "\n[+] No suspicious services found\n";
                 }
-                return $"[!] Service Summary: \n{summary}\n";
+                return $"\n[!] Service Summary: \n{summary}\n";
             }
             catch (Exception e)
             {

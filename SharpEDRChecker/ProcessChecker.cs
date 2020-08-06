@@ -13,7 +13,7 @@ namespace SharpEDRChecker
             {
                 Console.WriteLine("######################################");
                 Console.WriteLine("[!][!][!] Checking processes [!][!][!]");
-                Console.WriteLine("######################################");
+                Console.WriteLine("######################################\n");
                 var processList = new ManagementObjectSearcher("Select * From Win32_Process").Get();
                 string summary = "";
                 foreach (var process in processList)
@@ -108,7 +108,7 @@ namespace SharpEDRChecker
                     Console.WriteLine("[+] No suspicious modules found in your process\n");
                     return "\n[+] No suspicious modules found in your process\n";
                 }
-                return $"[!] Modload Summary: \n{summary}\n";
+                return $"\n[!] Modload Summary: \n{summary}\n";
             }
             catch (Exception e)
             {
