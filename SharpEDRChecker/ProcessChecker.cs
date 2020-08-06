@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Management;
 
 namespace SharpEDRChecker
@@ -12,7 +11,9 @@ namespace SharpEDRChecker
         {
             try
             {
-                Console.WriteLine("[!] Checking processes...");
+                Console.WriteLine("######################################");
+                Console.WriteLine("[!][!][!] Checking processes [!][!][!]");
+                Console.WriteLine("######################################");
                 var processList = new ManagementObjectSearcher("Select * From Win32_Process").Get();
                 string summary = "";
                 foreach (var process in processList)
@@ -24,12 +25,12 @@ namespace SharpEDRChecker
                     Console.WriteLine("[+] No suspicious processes found\n");
                     return "\n[+] No suspicious processes found\n";
                 }
-                return $"\nProcess Summary: \n{summary}\n";
+                return $"\n[!] Process Summary: \n{summary}\n";
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[-] Errored on getting processes: {e.Message}\n{e.StackTrace}");
-                return "\n[-] Errored on getting processes\n";
+                Console.WriteLine($"[-] Errored on checking processes: {e.Message}\n{e.StackTrace}");
+                return "\n[-] Errored on checking processes\n";
             }
         }
 
@@ -57,7 +58,7 @@ namespace SharpEDRChecker
                     metadata = $"{FileChecker.GetFileInfo(processPath.ToString())}";
                     allattribs = $"{allattribs} - {metadata}";
                 }
-
+                
                 var matches = new List<string>();
                 foreach (var edrstring in EDRData.edrlist)
                 {
@@ -78,13 +79,13 @@ namespace SharpEDRChecker
                                 $"\n\tProcess CmdLine: {processCmdLine}" +
                                 $"\n\tFile Metadata: {metadata}" +
                                 $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t{processName} : {string.Join(", ", matches)}\n";
+                    return $"\t[-] {processName} : {string.Join(", ", matches)}\n";
                 }
                 return "";
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[-] Errored on getting individual process: {process["Name"]} : {process["ProcessId"]}\n{e.Message}\n{e.StackTrace}");
+                Console.WriteLine($"[-] Errored on checking individual process: {process["Name"]} : {process["ProcessId"]}\n{e.Message}\n{e.StackTrace}");
                 return $"\t{process["Name"]} : Failed to perform checks\n";
             }
         }
@@ -93,7 +94,9 @@ namespace SharpEDRChecker
         {
             try
             {
-                Console.WriteLine("[!] Checking modules loaded in your current process...");
+                Console.WriteLine("###################################################################");
+                Console.WriteLine("[!][!][!] Checking modules loaded in your current process [!][!][!]");
+                Console.WriteLine("###################################################################\n");
                 Process myproc = Process.GetCurrentProcess();
                 var summary = "";
                 foreach (ProcessModule module in myproc.Modules)
@@ -105,12 +108,12 @@ namespace SharpEDRChecker
                     Console.WriteLine("[+] No suspicious modules found in your process\n");
                     return "\n[+] No suspicious modules found in your process\n";
                 }
-                return $"\nModload Summary: \n{summary}\n";
+                return $"[!] Modload Summary: \n{summary}\n";
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[-] Errored on getting modloads: {e.Message}\n{e.StackTrace}");
-                return "\n[-] Errored on getting processes\n";
+                Console.WriteLine($"[-] Errored on checking modloads: {e.Message}\n{e.StackTrace}");
+                return "\n[-] Errored on checking modloads\n";
             }
         }
 
@@ -135,13 +138,13 @@ namespace SharpEDRChecker
                                 $"\n\tSuspicious Module: {module.FileName}" +
                                 $"\n\tFile Metadata: {metadata}" +
                                 $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t{module.FileName} : {string.Join(", ", matches)}\n";
+                    return $"\t[-] {module.FileName} : {string.Join(", ", matches)}\n";
                 }
                 return "";
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[-] Errored on getting individual module: {module.FileName}\n{e.Message}\n{e.StackTrace}");
+                Console.WriteLine($"[-] Errored on checking individual module: {module.FileName}\n{e.Message}\n{e.StackTrace}");
                 return $"\t{module.FileName} : Failed to perform checks\n";
             }
         }

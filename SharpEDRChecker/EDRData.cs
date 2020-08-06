@@ -2,12 +2,16 @@
 {
     class EDRData
     {
-        //Define array of EDR products and store in an array
         public static string[] edrlist =
         {
                 "activeconsole",
                 "amsi.dll",
+                "anti malware",
                 "anti-malware",
+                "antimalware",
+                "anti virus",
+                "anti-virus",
+                "antivirus",
                 "authtap",
                 "avast",
                 "avecto",
@@ -31,10 +35,13 @@
                 "cyvera",
                 "cyserver",
                 "cytray",
+                "darktrace",
                 "defendpoint",
                 "defender",
                 "eectrl",
+                "elastic",
                 "endgame",
+                "forcepoint",
                 "fireeye",
                 "groundling",
                 "GRRservic",
@@ -81,9 +88,11 @@
                 "tda.exe",
                 "tdawork",
                 "tpython",
+                "vectra",
                 "wincollect",
                 "windowssensor",
                 "wireshark",
+                "threat",
                 "xagt"
         };
     }

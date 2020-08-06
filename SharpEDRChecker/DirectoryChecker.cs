@@ -10,12 +10,14 @@ namespace SharpEDRChecker
         {
             try
             {
-                Console.WriteLine("[!] Checking Directories...");
+                Console.WriteLine("########################################");
+                Console.WriteLine("[!][!][!] Checking Directories [!][!][!]");
+                Console.WriteLine("########################################\n");
                 string summary = "";
                 string[] progdirs = {
-                @"C:\Program Files",
-                @"C:\Program Files (x86)",
-                @"C:\ProgramData"};
+                    @"C:\Program Files",
+                    @"C:\Program Files (x86)",
+                    @"C:\ProgramData"};
 
                 foreach (string dir in progdirs)
                 {
@@ -27,12 +29,12 @@ namespace SharpEDRChecker
                     Console.WriteLine("[+] No suspicious directories found\n");
                     return "\n[+] No suspicious directories found\n";
                 }
-                return $"\nDirectory Summary: \n{summary}\n";
+                return $"[!] Directory Summary: \n{summary}\n";
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[-] Errored on getting directories: {e}");
-                return "[-] Errored on getting directories";
+                Console.WriteLine($"[-] Errored on checking directories: {e.Message}\n{e.StackTrace}");
+                return "\n[-] Errored on checking directories\n";
             }
         }
 
@@ -62,14 +64,14 @@ namespace SharpEDRChecker
                 {
                     Console.WriteLine($"[-] Suspicious directory found: {subdirectory}");
                     Console.WriteLine($"[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t{subdirectory} : {string.Join(", ", matches)}\n";
+                    return $"\t[-] {subdirectory} : {string.Join(", ", matches)}\n";
                 }
                 return "";
             } 
             catch (Exception e)
             {
-                Console.WriteLine($"Errored: {e}");
-                return "Errored";
+                Console.WriteLine($"[-] Errored on checking sub directory: {subdirectory}\n{e.Message}\n{e.StackTrace}");
+                return $"\t{subdirectory} : Failed to perform checks\n";
             }
         }
     }

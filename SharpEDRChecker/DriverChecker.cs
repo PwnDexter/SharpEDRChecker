@@ -29,6 +29,9 @@ namespace SharpEDRChecker
         {
             try
             {
+                Console.WriteLine("####################################");
+                Console.WriteLine("[!][!][!] Checking drivers [!][!][!]");
+                Console.WriteLine("####################################\n");
                 uint numberOfDrivers;
                 UIntPtr[] driverAddresses;
 
@@ -60,19 +63,18 @@ namespace SharpEDRChecker
                     Console.WriteLine("[+] No suspicious drivers found\n");
                     return "\nNo suspicious drivers found\n";
                 }
-                return $"\nDriver Summary: \n{summary}\n";
+                return $"[!] Driver Summary: \n{summary}";
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[-] Errored on getting drivers: {e.Message}\n{e.StackTrace}");
-                return "[-] Driver checks errored";
+                Console.WriteLine($"[-] Errored on checking drivers: {e.Message}\n{e.StackTrace}");
+                return "\n[-] Driver checks errored\n";
             }
         }
 
         private static string IterateOverDrivers(uint arraySize, UIntPtr[] ddAddresses)
         {
             var summary = "";
-            Console.WriteLine("[!] Checking drivers...");
             for (int i = 0; i < arraySize; i++)
             {
                 var driverFileName = GetDriverFileName(ddAddresses[i]);
@@ -108,13 +110,13 @@ namespace SharpEDRChecker
                                 $"\n\tSuspicious Module: {driverBaseName}" +
                                 $"\n\tFile Metadata: {metadata}" +
                                 $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t{driverBaseName} : {string.Join(", ", matches)}\n";
+                    return $"\t[-] {driverBaseName} : {string.Join(", ", matches)}\n";
                 }
                 return "";
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[-] Errored on getting driver {driverBaseName} {driverFileName}: {e.Message}\n{e.StackTrace}");
+                Console.WriteLine($"[-] Errored on checking driver {driverBaseName} : {driverFileName}\n{e.Message}\n{e.StackTrace}");
                 return $"\t{driverBaseName} : Failed to perform checks\n";
             }
         }

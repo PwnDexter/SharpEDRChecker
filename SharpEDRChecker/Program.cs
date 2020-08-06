@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SharpEDRChecker
 {
@@ -31,21 +30,31 @@ namespace SharpEDRChecker
 
         private static void PrintIntro(bool isAdm)
         {
-            Console.WriteLine("\n[!] Welcome to EDRChecker by @PwnDexter\n");
-            if(isAdm)
+            if (isAdm)
             {
-                Console.WriteLine("[+] Running as admin, all checks will be performed\n");
+                Console.WriteLine($"\n##################################################################");
+                Console.WriteLine("     [!][!][!] Welcome to EDRChecker by @PwnDexter [!][!][!]");
+                Console.WriteLine("[+][+][+] Running as admin, all checks will be performed [+][+][+]");
+                Console.WriteLine($"##################################################################\n");
             }
             else
             {
-                Console.WriteLine("[-] Not running as admin, privileged metadata may not checked\n");
+                Console.WriteLine($"\n###################################################################################################");
+                Console.WriteLine("                      [!][!][!] Welcome to EDRChecker by @PwnDexter [!][!][!]");
+                Console.WriteLine("[-][-][-] Not running as admin, some privileged metadata and processes may not be checked [-][-][-]");
+                Console.WriteLine($"###################################################################################################\n");
             }
         }
 
         private static void PrintOutro(string summary)
         {
-            Console.WriteLine($"[!] The tldr is: {summary}\n");
-            Console.WriteLine("[!] EDR Checks Complete\n");
+            Console.WriteLine($"################################");
+            Console.WriteLine($"[!][!][!] TLDR Summary [!][!][!]");
+            Console.WriteLine($"################################");
+            Console.WriteLine($"{summary}");
+            Console.WriteLine($"#######################################");
+            Console.WriteLine("[!][!][!] EDR Checks Complete [!][!][!]");
+            Console.WriteLine($"#######################################\n");
         }
     }
 }
