@@ -26,9 +26,15 @@ Run the binary against the local host and perform checks based on current user i
 run-exe SharpEDRChecker.Program SharpEDRChecker
 ```
 
+For use in PoshC2 ise the following:
+```
+sharpedrchecker
+```
+
 ## Example Output
 
-XXX
+Initial start down C2:
+![](https://raw.githubusercontent.com/PwnDexter/SharpEDRChecker/master/Images/sdrc-start.png)
 
 ## Roadmap
 - [ ] - Add more EDR Products - never ending
