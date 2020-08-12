@@ -1,8 +1,8 @@
-# SharpEDRChecker - Faster, Better and Sharper!
+# SharpEDRChecker
 
-C# Implementation of Invoke-EDRChecker (https://github.com/PwnDexter/Invoke-EDRChecker). Checks running processes, process metadata, Dlls loaded into your current process and each DLLs metadata, common install directories, installed services and each service binaries metadata, installed drivers and each drivers metadata, all for the presence of known defensive products such as AV's, EDR's and logging tools. Catches hidden EDRs as well via its metadata checks, more info in a blog post coming soon.
+New and improved C# Implementation of [Invoke-EDRChecker](https://github.com/PwnDexter/Invoke-EDRChecker). Checks running processes, process metadata, Dlls loaded into your current process and each DLLs metadata, common install directories, installed services and each service binaries metadata, installed drivers and each drivers metadata, all for the presence of known defensive products such as AV's, EDR's and logging tools. Catches hidden EDRs as well via its metadata checks, more info in a blog post coming soon.
 
-This binary can be loaded into your C2 server by loading the module then running it. Note: this binary is now included in PoshC2 so no need to manually add it.
+This binary can be loaded into your C2 server by loading the module then running it. Note: this binary is now included in [PoshC2](https://github.com/nettitude/PoshC2) so no need to manually add it.
 
 I will continue to add and improve the list when time permits. A full roadmap can be found below.
 
@@ -31,13 +31,39 @@ For use in PoshC2 ise the following:
 sharpedrchecker
 ```
 
-## Example Output
-
-Initial start down C2:
-![](https://raw.githubusercontent.com/PwnDexter/SharpEDRChecker/master/Images/sdrc-start.png)
-
 ## Roadmap
 - [ ] - Add more EDR Products - never ending
 - [ ] - Test across more Windows and .NET versions
 - [ ] - Add remote host query capability
 - [ ] - Port to python for unix/macos support
+
+
+## Example Output
+
+Initial start down C2:
+
+![](https://github.com/PwnDexter/SharpEDRChecker/blob/master/Images/sdrc-start.png)
+
+Processes:
+
+![](https://github.com/PwnDexter/SharpEDRChecker/blob/master/Images/sdrc-processes.png)
+
+Modloads in your process:
+
+![](https://github.com/PwnDexter/SharpEDRChecker/blob/master/Images/sdrc-modload.png)
+
+Directories:
+
+![](https://github.com/PwnDexter/SharpEDRChecker/blob/master/Images/sdrc-directories.png)
+
+Services:
+
+![](https://github.com/PwnDexter/SharpEDRChecker/blob/master/Images/sdrc-services.png)
+
+Drivers:
+
+![](https://github.com/PwnDexter/SharpEDRChecker/blob/master/Images/sdrc-drivers.png)
+
+TLDR Summary:
+
+![](https://github.com/PwnDexter/SharpEDRChecker/blob/master/Images/sdrc-tldr.png)
