@@ -6,7 +6,7 @@ This binary can be loaded into your C2 server by loading the module then running
 
 I will continue to add and improve the list when time permits. A full roadmap can be found below.
 
-Find me on twitter @PwnDexter for any issues or questions!
+Find me on twitter [@PwnDexter](https://twitter.com/PwnDexter) for any issues or questions!
 
 ## Install & Compile
 
