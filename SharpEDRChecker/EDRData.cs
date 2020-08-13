@@ -12,6 +12,7 @@
                 "anti virus",
                 "anti-virus",
                 "antivirus",
+                "appsense",
                 "authtap",
                 "avast",
                 "avecto",
@@ -47,6 +48,7 @@
                 "groundling",
                 "GRRservic",
                 "inspector",
+                "ivanti",
                 "kaspersky",
                 "lacuna",
                 "logrhythm",
@@ -94,7 +96,8 @@
                 "windowssensor",
                 "wireshark",
                 "threat",
-                "xagt"
+                "xagt.exe",
+                "xagtnotif.exe"
         };
     }
 }

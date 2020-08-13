@@ -93,6 +93,10 @@ namespace SharpEDRChecker
                 {
                     fixedDriverPath = fixedDriverPath.Replace(@"\windows\".ToLower(), @"c:\windows\".ToLower());
                 }
+                else if (fixedDriverPath.ToLower().StartsWith(@"\??\"))
+                {
+                    fixedDriverPath = fixedDriverPath.ToLower().Replace(@"\??\", @"");
+                }
                 var metadata = $"{FileChecker.GetFileInfo(fixedDriverPath)}";
                 var allattribs = $"{driverBaseName} - {metadata}";
 

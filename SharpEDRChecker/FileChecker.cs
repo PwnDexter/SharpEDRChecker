@@ -27,7 +27,7 @@ namespace SharpEDRChecker
             {
                 if (filePath.ToLower().StartsWith(@"c:\windows\system32\"))
                 {
-                    filePath = filePath.ToLower().Replace(@"c:\windows\system32\", @"C:\Windows\Sysnative\");
+                    filePath = filePath.ToLower().Replace(@"c:\windows\system32\", @"c:\Windows\Sysnative\");
                     return GetFileInfo(filePath);
                 }
                 else
