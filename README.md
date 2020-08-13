@@ -10,7 +10,7 @@ Find me on twitter [@PwnDexter](https://twitter.com/PwnDexter) for any issues or
 
 ## Install & Compile
 
-Git clone the repo down and open the solution in Visual Studio then build the project.
+Git clone the repo down and open the solution in Visual Studio then build the project or alternatively download the latest release from [here](https://github.com/PwnDexter/SharpEDRChecker/releases).
 
 ```
 git clone https://github.com/PwnDexter/SharpEDRChecker.git
