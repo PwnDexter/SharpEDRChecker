@@ -71,7 +71,7 @@ namespace SharpEDRChecker
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on checking sub directory: {subdirectory}\n{e.Message}\n{e.StackTrace}");
-                return $"\t{subdirectory} : Failed to perform checks\n";
+                return $"\t[-] {subdirectory} : Failed to perform checks\n";
             }
         }
     }

@@ -86,7 +86,7 @@ namespace SharpEDRChecker
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on checking individual process: {process["Name"]} : {process["ProcessId"]}\n{e.Message}\n{e.StackTrace}");
-                return $"\t{process["Name"]} : Failed to perform checks\n";
+                return $"\t[-] {process["Name"]} : Failed to perform checks\n";
             }
         }
 
@@ -145,7 +145,7 @@ namespace SharpEDRChecker
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on checking individual module: {module.FileName}\n{e.Message}\n{e.StackTrace}");
-                return $"\t{module.FileName} : Failed to perform checks\n";
+                return $"\t[-] {module.FileName} : Failed to perform checks\n";
             }
         }
     }

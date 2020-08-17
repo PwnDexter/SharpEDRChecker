@@ -38,7 +38,7 @@ namespace SharpEDRChecker
                 uint sizeOfDriverArrayInBytes = GetSizeOfDriversArray();
                 if (sizeOfDriverArrayInBytes == 0)
                 {
-                    Console.WriteLine("[!] Error getting driver array size");
+                    Console.WriteLine("[-] Error getting driver array size");
                     return "\n[-] Driver checks errored\n";
                 }
 

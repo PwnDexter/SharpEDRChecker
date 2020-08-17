@@ -87,7 +87,7 @@ namespace SharpEDRChecker
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on checking individual service: {service["Name"]}\n{e.Message}\n{e.StackTrace}");
-                return $"\t{service["Name"]} : Failed to perform checks\n";
+                return $"\t[-] {service["Name"]} : Failed to perform checks\n";
             }
         }
     }

@@ -36,6 +36,11 @@ namespace SharpEDRChecker
                     return "";
                 }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[-] Errored on getting file info for: {filePath}\n{e.Message}\n{e.StackTrace}");
+                return "";
+            }
         }
     }
 }
