@@ -113,8 +113,8 @@ namespace SharpEDRChecker
                     Console.WriteLine("[-] Suspicious driver found:" +
                                 $"\n\tSuspicious Module: {driverBaseName}" +
                                 $"\n\tFile Metadata: {metadata}" +
-                                $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t[-] {driverBaseName} : {string.Join(", ", matches)}\n";
+                                $"\n[!] Matched on: {string.Join(", ", matches.ToArray())}\n");
+                    return $"\t[-] {driverBaseName} : {string.Join(", ", matches.ToArray())}\n";
                 }
                 return "";
             }

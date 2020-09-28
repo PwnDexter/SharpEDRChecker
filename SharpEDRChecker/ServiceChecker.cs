@@ -79,8 +79,8 @@ namespace SharpEDRChecker
                            $"\n\tStatus: {serviceState}" +
                            $"\n\tProcess ID: {servicePID}" +
                            $"\n\tFile Metadata: {metadata}" +
-                           $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t[-] {serviceName} : {string.Join(", ", matches)}\n";
+                           $"\n[!] Matched on: {string.Join(", ", matches.ToArray())}\n");
+                    return $"\t[-] {serviceName} : {string.Join(", ", matches.ToArray())}\n";
                 }
                 return "";
             } 

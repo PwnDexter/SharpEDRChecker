@@ -63,8 +63,8 @@ namespace SharpEDRChecker
                 if (matches.Count > 0)
                 {
                     Console.WriteLine($"[-] Suspicious directory found: {subdirectory}");
-                    Console.WriteLine($"[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t[-] {subdirectory} : {string.Join(", ", matches)}\n";
+                    Console.WriteLine($"[!] Matched on: {string.Join(", ", matches.ToArray())}\n");
+                    return $"\t[-] {subdirectory} : {string.Join(", ", matches.ToArray())}\n";
                 }
                 return "";
             } 

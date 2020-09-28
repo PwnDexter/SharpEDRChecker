@@ -78,8 +78,8 @@ namespace SharpEDRChecker
                                 $"\n\tParent Process: {processParent}" +
                                 $"\n\tProcess CmdLine: {processCmdLine}" +
                                 $"\n\tFile Metadata: {metadata}" +
-                                $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t[-] {processName} : {string.Join(", ", matches)}\n";
+                                $"\n[!] Matched on: {string.Join(", ", matches.ToArray())}\n");
+                    return $"\t[-] {processName} : {string.Join(", ", matches.ToArray())}\n";
                 }
                 return "";
             }
@@ -137,8 +137,8 @@ namespace SharpEDRChecker
                     Console.WriteLine("[-] Suspicious modload found in your process:" +
                                 $"\n\tSuspicious Module: {module.FileName}" +
                                 $"\n\tFile Metadata: {metadata}" +
-                                $"\n[!] Matched on: {string.Join(", ", matches)}\n");
-                    return $"\t[-] {module.FileName} : {string.Join(", ", matches)}\n";
+                                $"\n[!] Matched on: {string.Join(", ", matches.ToArray())}\n");
+                    return $"\t[-] {module.FileName} : {string.Join(", ", matches.ToArray())}\n";
                 }
                 return "";
             }
