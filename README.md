@@ -1,7 +1,5 @@
 # SharpEDRChecker
 
-Pre-release version available here with the latest updates: https://github.com/PwnDexter/SharpEDRChecker/releases/tag/v1.2-PRE
-
 New and improved C# Implementation of [Invoke-EDRChecker](https://github.com/PwnDexter/Invoke-EDRChecker). Checks running processes, process metadata, Dlls loaded into your current process and each DLLs metadata, common install directories, installed services and each service binaries metadata, installed drivers and each drivers metadata, all for the presence of known defensive products such as AV's, EDR's and logging tools. Catches hidden EDRs as well via its metadata checks, more info can be found in my blog post [here](https://redteaming.co.uk/2021/03/18/sharpedrchecker/).
 
 This binary can be loaded into your C2 server by loading the module then running it. Note: this binary is now included in [PoshC2](https://github.com/nettitude/PoshC2) so no need to manually add it.
