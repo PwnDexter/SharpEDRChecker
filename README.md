@@ -1,4 +1,5 @@
 # SharpEDRChecker
+![Pytest](https://github.com/PwnDexter/SharpEDRChecker/actions/workflows/ci-build.yml/badge.svg)
 
 New and improved C# Implementation of [Invoke-EDRChecker](https://github.com/PwnDexter/Invoke-EDRChecker). Checks running processes, process metadata, Dlls loaded into your current process and each DLLs metadata, common install directories, installed services and each service binaries metadata, installed drivers and each drivers metadata, all for the presence of known defensive products such as AV's, EDR's and logging tools. Catches hidden EDRs as well via its metadata checks, more info can be found in my blog post [here](https://redteaming.co.uk/2021/03/18/sharpedrchecker/).
 
