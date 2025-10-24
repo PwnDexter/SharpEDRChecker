@@ -1,35 +1,44 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace SharpEDRChecker
 {
-    internal class DirectoryChecker
+    internal class DirectoryChecker : IChecker
     {
-        internal static string CheckDirectories()
+        public string Name => "directories";
+        public string Check()
         {
             try
             {
                 Console.WriteLine("########################################");
                 Console.WriteLine("[!][!][!] Checking Directories [!][!][!]");
                 Console.WriteLine("########################################\n");
-                string summary = "";
-                string[] progdirs = {
-                    @"C:\Program Files",
-                    @"C:\Program Files (x86)",
-                    @"C:\ProgramData"};
+                var summaryBuilder = new StringBuilder();
+                var progdirs = new List<string> {
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) };
 
                 foreach (string dir in progdirs)
                 {
-                    string[] subdirectories = Directory.GetDirectories(dir);
-                    summary += CheckDirectory(subdirectories);
+                    try
+                    {
+                        string[] subdirectories = Directory.GetDirectories(dir);
+                        summaryBuilder.Append(CheckDirectory(subdirectories));
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        Console.WriteLine($"[-] Access denied to directory, cannot list subdirectories: {dir}\n");
+                    }
                 }
-                if (string.IsNullOrEmpty(summary))
+                if (summaryBuilder.Length == 0)
                 {
                     Console.WriteLine("[+] No suspicious directories found\n");
                     return "\n[+] No suspicious directories found\n";
                 }
-                return $"\n[!] Directory Summary: \n{summary}\n";
+                return $"\n[!] Directory Summary: \n{summaryBuilder.ToString()}\n";
             }
             catch (Exception e)
             {
@@ -38,28 +47,21 @@ namespace SharpEDRChecker
             }
         }
 
-        private static string CheckDirectory(string[] subdirectories)
+        private string CheckDirectory(string[] subdirectories)
         {
-            var summary = "";
+            var summaryBuilder = new StringBuilder();
             foreach (var subdirectory in subdirectories)
             {
-                summary += CheckSubDirectory(subdirectory);  
+                summaryBuilder.Append(CheckSubDirectory(subdirectory));
             }
-            return summary;
+            return summaryBuilder.ToString();
         }
 
-        private static string CheckSubDirectory(string subdirectory)
+        private string CheckSubDirectory(string subdirectory)
         {
             try
             {
-                var matches = new List<string>();
-                foreach (var edrstring in EDRData.edrlist)
-                {
-                    if (subdirectory.ToString().ToLower().Contains(edrstring.ToLower()))
-                    {
-                        matches.Add(edrstring);
-                    }
-                }
+                var matches = EDRMatcher.GetMatches(subdirectory);
                 if (matches.Count > 0)
                 {
                     Console.WriteLine($"[-] Suspicious directory found: {subdirectory}");
@@ -67,7 +69,7 @@ namespace SharpEDRChecker
                     return $"\t[-] {subdirectory} : {string.Join(", ", matches.ToArray())}\n";
                 }
                 return "";
-            } 
+            }
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on checking sub directory: {subdirectory}\n{e.Message}\n{e.StackTrace}");

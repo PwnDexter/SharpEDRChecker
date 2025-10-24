@@ -1,26 +1,50 @@
-name: CI Build
+name: Build and Release
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
 
-    - name: Setup.NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Restore dependencies
-      run: dotnet restore SharpEDRChecker/SharpEDRChecker.sln
+      - name: Restore dependencies
+        run: msbuild SharpEDRChecker/SharpEDRChecker.sln /t:restore
 
-    - name: Build project
-      run: dotnet build SharpEDRChecker/SharpEDRChecker.sln --configuration Release --no-restore
+      - name: Build for AnyCPU
+        run: msbuild SharpEDRChecker/SharpEDRChecker.sln /p:Configuration=Release /p:Platform="AnyCPU"
+
+      - name: Build for x64
+        run: msbuild SharpEDRChecker/SharpEDRChecker.sln /p:Configuration=Release /p:Platform=x64
+
+      - name: Build for x86
+        run: msbuild SharpEDRChecker/SharpEDRChecker.sln /p:Configuration=Release /p:Platform=x86
+
+      - name: Rename artifacts for clarity
+        run: |
+          ren SharpEDRChecker/bin/Release/SharpEDRChecker.exe SharpEDRChecker-AnyCPU.exe
+          ren SharpEDRChecker/bin/x64/Release/SharpEDRChecker.exe SharpEDRChecker-x64.exe
+          ren SharpEDRChecker/bin/x86/Release/SharpEDRChecker.exe SharpEDRChecker-x86.exe
+        shell: cmd
+
+      - name: Create Release and Upload Assets
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Release v1.0.${{ github.run_number }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          files: |
+            SharpEDRChecker-AnyCPU.exe
+            SharpEDRChecker-x64.exe
+            SharpEDRChecker-x86.exe

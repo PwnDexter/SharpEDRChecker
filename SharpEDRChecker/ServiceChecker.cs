@@ -1,30 +1,33 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Management;
+using System.Text;
 
 namespace SharpEDRChecker
 {
-    internal class ServiceChecker
+    internal class ServiceChecker : IChecker
     {
-        internal static string CheckServices()
+        public string Name => "services";
+        public string Check()
         {
             Console.WriteLine("#####################################");
             Console.WriteLine("[!][!][!] Checking Services [!][!][!]");
             Console.WriteLine("#####################################\n");
             try
             {
-                var serviceList = new ManagementObjectSearcher("Select * From Win32_Service").Get();
-                string summary = "";
+                var wmiQuery = "Select Name, DisplayName, Description, Caption, PathName, State, ProcessId From Win32_Service";
+                var serviceList = new ManagementObjectSearcher(wmiQuery).Get();
+                var summaryBuilder = new StringBuilder();
                 foreach (var service in serviceList)
                 {
-                    summary += CheckService(service);
+                    summaryBuilder.Append(CheckService(service));
                 }
-                if (string.IsNullOrEmpty(summary))
+                if (summaryBuilder.Length == 0)
                 {
                     Console.WriteLine("[+] No suspicious services found\n");
                     return "\n[+] No suspicious services found\n";
                 }
-                return $"\n[!] Service Summary: \n{summary}\n";
+                return $"\n[!] Service Summary: \n{summaryBuilder.ToString()}\n";
             }
             catch (Exception e)
             {
@@ -33,7 +36,7 @@ namespace SharpEDRChecker
             }
         }
 
-        private static string CheckService(ManagementBaseObject service)
+        private string CheckService(ManagementBaseObject service)
         {
             try
             {
@@ -54,20 +57,23 @@ namespace SharpEDRChecker
 
                 if (servicePathName != null)
                 {
-                    var indexOfExe = servicePathName.ToString().ToLower().IndexOf(".exe");
-                    var filePath = servicePathName.ToString().Substring(0, indexOfExe + ".exe".Length).Trim('"');
-                    metadata = $"{FileChecker.GetFileInfo(filePath)}";
-                    allattribs = $"{allattribs} - {metadata}";
-                }
-
-                var matches = new List<string>();
-                foreach (var edrstring in EDRData.edrlist)
-                {
-                    if (allattribs.ToLower().Contains(edrstring.ToLower()))
+                    try
                     {
-                        matches.Add(edrstring);
+                        var indexOfExe = servicePathName.ToString().ToLower().IndexOf(".exe");
+                        if (indexOfExe != -1)
+                        {
+                            var filePath = servicePathName.ToString().Substring(0, indexOfExe + ".exe".Length).Trim('"');
+                            metadata = $"{FileChecker.GetFileInfo(filePath)}";
+                            allattribs = $"{allattribs} - {metadata}";
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"[-] Could not get file metadata for service binary: {servicePathName}\n[-] {e.Message}\n");
                     }
                 }
+
+                var matches = EDRMatcher.GetMatches(allattribs);
                 if (matches.Count > 0)
                 {
                     Console.WriteLine($"[-] Suspicious service found:" +
@@ -83,7 +89,7 @@ namespace SharpEDRChecker
                     return $"\t[-] {serviceName} : {string.Join(", ", matches.ToArray())}\n";
                 }
                 return "";
-            } 
+            }
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Errored on checking individual service: {service["Name"]}\n{e.Message}\n{e.StackTrace}");

@@ -1,6 +1,7 @@
-﻿using System;
+﻿﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace SharpEDRChecker
 {
@@ -12,16 +13,18 @@ namespace SharpEDRChecker
             try
             {
                 fileVersionInfo = FileVersionInfo.GetVersionInfo(filePath);
-                return $"\n \t\t Product Name: {fileVersionInfo.ProductName}" +
-                    $"\n \t\t Filename: {fileVersionInfo.FileName}" +
-                    $"\n \t\t Original Filename: {fileVersionInfo.OriginalFilename}" +
-                    $"\n \t\t Internal Name: {fileVersionInfo.InternalName}" +
-                    $"\n \t\t Company Name: {fileVersionInfo.CompanyName}" +
-                    $"\n \t\t File Description: {fileVersionInfo.FileDescription}" +
-                    $"\n \t\t Product Version: {fileVersionInfo.ProductVersion}" +
-                    $"\n \t\t Comments: {fileVersionInfo.Comments}" +
-                    $"\n \t\t Legal Copyright: {fileVersionInfo.LegalCopyright}" +
-                    $"\n \t\t Legal Trademarks: {fileVersionInfo.LegalTrademarks}";
+                var sb = new StringBuilder();
+                sb.AppendLine($"\n \t\t Product Name: {fileVersionInfo.ProductName}");
+                sb.AppendLine($" \t\t Filename: {fileVersionInfo.FileName}");
+                sb.AppendLine($" \t\t Original Filename: {fileVersionInfo.OriginalFilename}");
+                sb.AppendLine($" \t\t Internal Name: {fileVersionInfo.InternalName}");
+                sb.AppendLine($" \t\t Company Name: {fileVersionInfo.CompanyName}");
+                sb.AppendLine($" \t\t File Description: {fileVersionInfo.FileDescription}");
+                sb.AppendLine($" \t\t Product Version: {fileVersionInfo.ProductVersion}");
+                sb.AppendLine($" \t\t Comments: {fileVersionInfo.Comments}");
+                sb.AppendLine($" \t\t Legal Copyright: {fileVersionInfo.LegalCopyright}");
+                sb.AppendLine($" \t\t Legal Trademarks: {fileVersionInfo.LegalTrademarks}");
+                return sb.ToString();
             }
             catch (FileNotFoundException)
             {

@@ -1,11 +1,13 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SharpEDRChecker
 {
-    internal class DriverChecker
+    internal class DriverChecker : IChecker
     {
         [DllImport("psapi")]
         private static extern bool EnumDeviceDrivers(
@@ -25,7 +27,8 @@ namespace SharpEDRChecker
             StringBuilder ddBaseName,
             int baseNameStringSizeChars);
 
-        internal static string CheckDrivers()
+        public string Name => "drivers";
+        public string Check()
         {
             try
             {
@@ -72,42 +75,27 @@ namespace SharpEDRChecker
             }
         }
 
-        private static string IterateOverDrivers(uint arraySize, UIntPtr[] ddAddresses)
+        private string IterateOverDrivers(uint arraySize, UIntPtr[] ddAddresses)
         {
-            var summary = "";
-            for (int i = 0; i < arraySize; i++)
+            var summaryBag = new ConcurrentBag<string>();
+            Parallel.For(0, arraySize, i =>
             {
                 var driverFileName = GetDriverFileName(ddAddresses[i]);
                 var driverBaseName = GetDriverBaseName(ddAddresses[i]);
-                summary += CheckDriver(driverFileName, driverBaseName);
-            }
-            return summary;
+                summaryBag.Add(CheckDriver(driverFileName, driverBaseName));
+            });
+            return string.Join("", summaryBag);
         }
 
-        internal static string CheckDriver(string driverFileName, string driverBaseName)
+        private string CheckDriver(string driverFileName, string driverBaseName)
         {
             try
             {
-                var fixedDriverPath = driverFileName.ToLower().Replace(@"\systemroot\".ToLower(), @"c:\windows\".ToLower());
-                if (fixedDriverPath.StartsWith(@"\windows\"))
-                {
-                    fixedDriverPath = fixedDriverPath.Replace(@"\windows\".ToLower(), @"c:\windows\".ToLower());
-                }
-                else if (fixedDriverPath.ToLower().StartsWith(@"\??\"))
-                {
-                    fixedDriverPath = fixedDriverPath.ToLower().Replace(@"\??\", @"");
-                }
-                var metadata = $"{FileChecker.GetFileInfo(fixedDriverPath)}";
+                var expandedPath = Environment.ExpandEnvironmentVariables(driverFileName.Replace(@"\??\", ""));
+                var metadata = $"{FileChecker.GetFileInfo(expandedPath)}";
                 var allattribs = $"{driverBaseName} - {metadata}";
 
-                var matches = new List<string>();
-                foreach (var edrstring in EDRData.edrlist)
-                {
-                    if (allattribs.ToString().ToLower().Contains(edrstring.ToLower()))
-                    {
-                        matches.Add(edrstring);
-                    }
-                }
+                var matches = EDRMatcher.GetMatches(allattribs);
                 if (matches.Count > 0)
                 {
                     Console.WriteLine("[-] Suspicious driver found:" +
@@ -125,7 +113,7 @@ namespace SharpEDRChecker
             }
         }
 
-        private static string GetDriverBaseName(UIntPtr driverAddress)
+        private string GetDriverBaseName(UIntPtr driverAddress)
         {
             StringBuilder driverBaseNamesb = new StringBuilder(1000);
             int result = GetDeviceDriverBaseName(driverAddress, driverBaseNamesb, driverBaseNamesb.Capacity);
@@ -138,7 +126,7 @@ namespace SharpEDRChecker
             return driverBaseNamesb.ToString();
         }
 
-        private static string GetDriverFileName(UIntPtr driverAddress)
+        private string GetDriverFileName(UIntPtr driverAddress)
         {
             StringBuilder driverFileNamesb = new StringBuilder(1000);
             int result = GetDeviceDriverFileName(driverAddress, driverFileNamesb, driverFileNamesb.Capacity);
@@ -151,7 +139,7 @@ namespace SharpEDRChecker
             return driverFileNamesb.ToString();
         }
 
-        private static uint GetSizeOfDriversArray()
+        private uint GetSizeOfDriversArray()
         {
             uint bytesNeeded;
             bool success = EnumDeviceDrivers(null, 0, out bytesNeeded);
