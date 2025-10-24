@@ -1,4 +1,5 @@
 # SharpEDRChecker
+
 ![Pytest](https://github.com/PwnDexter/SharpEDRChecker/actions/workflows/ci-build.yml/badge.svg)
 
 New and improved C# Implementation of [Invoke-EDRChecker](https://github.com/PwnDexter/Invoke-EDRChecker). Checks running processes, process metadata, Dlls loaded into your current process and each DLLs metadata, common install directories, installed services and each service binaries metadata, installed drivers and each drivers metadata, all for the presence of known defensive products such as AV's, EDR's and logging tools. Catches hidden EDRs as well via its metadata checks, more info can be found in my blog post [here](https://redteaming.co.uk/2021/03/18/sharpedrchecker/).
@@ -17,27 +18,41 @@ Git clone the repo down and open the solution in Visual Studio then build the pr
 git clone https://github.com/PwnDexter/SharpEDRChecker.git
 ```
 
+## Dev Build - Instructions
+
+The Dev branch is where I add new features and test them before merging them into main. To build from the dev branch, clone the repo and checkout the dev branch:
+
+```
+git clone https://github.com/PwnDexter/SharpEDRChecker.git
+cd SharpEDRChecker
+git checkout dev
+```
+
+Then open the solution in Visual Studio and build the project.
+
 ## Usage
 
 Once the binary has been loaded onto your host or into your C2 of choice, you can use the following commands:
 
 Run the binary against the local host and perform checks based on current user integrity:
+
 ```
 .\SharpEDRChecker.exe
 run-exe SharpEDRChecker.Program SharpEDRChecker
 ```
 
 For use in PoshC2 ise the following:
+
 ```
 sharpedrchecker
 ```
 
 ## Roadmap
+
 - [ ] - Add more EDR Products - never ending
 - [ ] - Test across more Windows and .NET versions
 - [ ] - Add remote host query capability
 - [ ] - Port to python for unix/macos support
-
 
 ## Example Output
 
