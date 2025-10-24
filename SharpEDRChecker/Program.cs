@@ -58,11 +58,8 @@ namespace SharpEDRChecker
                 }
 
                 var summaryBuilder = new StringBuilder();
-                var random = new Random();
                 foreach (var checker in checkersToRun)
                 {
-                    // Sleep for a random time between 2 to 7 seconds to break up the activity pattern
-                    System.Threading.Thread.Sleep(random.Next(2000, 7000));
                     summaryBuilder.Append(checker.Check());
                 }
 

@@ -2,7 +2,7 @@ name: Build and Release
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev] # Added 'dev' branch to triggers
 
 jobs:
   build:
@@ -30,12 +30,25 @@ jobs:
 
       - name: Rename artifacts for clarity
         run: |
-          ren SharpEDRChecker/bin/Release/SharpEDRChecker.exe SharpEDRChecker-AnyCPU.exe
-          ren SharpEDRChecker/bin/x64/Release/SharpEDRChecker.exe SharpEDRChecker-x64.exe
-          ren SharpEDRChecker/bin/x86/Release/SharpEDRChecker.exe SharpEDRChecker-x86.exe
-        shell: cmd
+          $branchName = "${{ github.ref_name }}"
+          $outputDir = "SharpEDRChecker/bin"
+          $releaseDir = "$outputDir/Release"
+          $x64Dir = "$outputDir/x64/Release"
+          $x86Dir = "$outputDir/x86/Release"
 
-      - name: Create Release and Upload Assets
+          if ($branchName -eq "main") {
+            Rename-Item -Path "$releaseDir/SharpEDRChecker.exe" -NewName "SharpEDRChecker-AnyCPU.exe"
+            Rename-Item -Path "$x64Dir/SharpEDRChecker.exe" -NewName "SharpEDRChecker-x64.exe"
+            Rename-Item -Path "$x86Dir/SharpEDRChecker.exe" -NewName "SharpEDRChecker-x86.exe"
+          } else {
+            Rename-Item -Path "$releaseDir/SharpEDRChecker.exe" -NewName "SharpEDRChecker-AnyCPU-${branchName}.exe"
+            Rename-Item -Path "$x64Dir/SharpEDRChecker.exe" -NewName "SharpEDRChecker-x64-${branchName}.exe"
+            Rename-Item -Path "$x86Dir/SharpEDRChecker.exe" -NewName "SharpEDRChecker-x86-${branchName}.exe"
+          }
+        shell: pwsh # Using PowerShell for conditional renaming
+
+      - name: Create Release and Upload Assets (Main Branch)
+        if: github.ref == 'refs/heads/main' # Only create release for main branch
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
@@ -45,6 +58,16 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            SharpEDRChecker-AnyCPU.exe
-            SharpEDRChecker-x64.exe
-            SharpEDRChecker-x86.exe
+            SharpEDRChecker/bin/Release/SharpEDRChecker-AnyCPU.exe
+            SharpEDRChecker/bin/x64/Release/SharpEDRChecker-x64.exe
+            SharpEDRChecker/bin/x86/Release/SharpEDRChecker-x86.exe
+
+      - name: Upload Dev Branch Artifacts
+        if: github.ref == 'refs/heads/dev' # Only upload artifacts for dev branch
+        uses: actions/upload-artifact@v4
+        with:
+          name: SharpEDRChecker-dev-build-${{ github.run_number }}
+          path: |
+            SharpEDRChecker/bin/Release/SharpEDRChecker-AnyCPU-dev.exe
+            SharpEDRChecker/bin/x64/Release/SharpEDRChecker-x64-dev.exe
+            SharpEDRChecker/bin/x86/Release/SharpEDRChecker-x86-dev.exe
