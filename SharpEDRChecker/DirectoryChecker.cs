@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -50,7 +50,7 @@ namespace SharpEDRChecker
         private string CheckDirectory(string[] subdirectories)
         {
             var summaryBuilder = new StringBuilder();
-            foreach (var subdirectory in subdirectories)
+            foreach (string subdirectory in subdirectories)
             {
                 summaryBuilder.Append(CheckSubDirectory(subdirectory));
             }

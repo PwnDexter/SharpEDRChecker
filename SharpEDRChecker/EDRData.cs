@@ -1,4 +1,4 @@
-﻿namespace SharpEDRChecker
+﻿﻿namespace SharpEDRChecker
 {
     class EDRData
     {
@@ -133,9 +133,7 @@
                 "wincollect",
                 "windowssensor",
                 "wireshark",
-                "withsecure",
-                "xagt.exe",
-                "xagtnotif.exe"
+                "withsecure"
         };
     }
 }

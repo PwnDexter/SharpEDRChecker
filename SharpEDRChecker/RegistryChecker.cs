@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+﻿﻿using Microsoft.Win32;
 using System;
 using System.Text;
 
@@ -52,11 +52,11 @@ namespace SharpEDRChecker
             var summaryBuilder = new StringBuilder();
             foreach (var path in keyPaths)
             {
-                try
+                using (RegistryKey key = hive.OpenSubKey(path))
                 {
-                    using (RegistryKey key = hive.OpenSubKey(path))
+                    if (key == null) continue;
+                    try
                     {
-                        if (key == null) continue;
                         foreach (string valueName in key.GetValueNames())
                         {
                             object value = key.GetValue(valueName);
@@ -75,17 +75,14 @@ namespace SharpEDRChecker
                             var matches = EDRMatcher.GetMatches(allattribs);
                             if (matches.Count > 0)
                             {
-                                Console.WriteLine($"[-] Suspicious registry entry found:" +
-                                                  $"\n\tKey: {key.Name}" +
-                                                  $"\n\tValue: {valueName}" +
-                                                  $"\n\tData: {valueData}" +
-                                                  $"\n[!] Matched on: {string.Join(", ", matches.ToArray())}\n");
+                                Console.WriteLine($"[-] Suspicious registry entry found:\n\tKey: {key.Name}\n\tValue: {valueName}\n\tData: {valueData}\n[!] Matched on: {string.Join(", ", matches.ToArray())}\n");
                                 summaryBuilder.Append($"\t[-] {key.Name}\\{valueName} : {string.Join(", ", matches.ToArray())}\n");
                             }
                         }
                     }
+                    catch (System.Security.SecurityException) { /* Ignore keys we can't access */ }
+                    catch (Exception ex) { Console.WriteLine($"[-] Error reading registry key {key.Name}: {ex.Message}"); }
                 }
-                catch (System.Security.SecurityException) { /* Ignore keys we can't access */ }
             }
             return summaryBuilder.ToString();
         }

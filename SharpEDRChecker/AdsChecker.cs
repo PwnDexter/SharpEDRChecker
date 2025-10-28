@@ -52,12 +52,16 @@ namespace SharpEDRChecker
                 {
                     try
                     {
-                        foreach (var file in Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories))
+                        var files = Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories);
+                        foreach (var file in files)
                         {
                             summaryBuilder.Append(CheckFileForAds(file));
                         }
                     }
-                    catch (UnauthorizedAccessException) { /* Ignore directories we can't access */ }
+                    catch (UnauthorizedAccessException)
+                    {
+                        Console.WriteLine($"[-] Access denied to directory, cannot check for ADS: {dir}");
+                    }
                 }
 
                 var summary = summaryBuilder.ToString();

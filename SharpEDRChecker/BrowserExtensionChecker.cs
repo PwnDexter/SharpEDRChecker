@@ -78,7 +78,10 @@ namespace SharpEDRChecker
                     }
                 }
             }
-            catch (UnauthorizedAccessException) { /* Ignore */ }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine($"[-] Access denied while checking {browserName} extensions at {userDataPath}.");
+            }
             catch (Exception e)
             {
                 Console.WriteLine($"[-] Could not check {browserName} extensions at {userDataPath}: {e.Message}");

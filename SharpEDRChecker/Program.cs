@@ -1,7 +1,4 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿﻿﻿﻿using System;
 
 namespace SharpEDRChecker
 {
@@ -13,57 +10,25 @@ namespace SharpEDRChecker
             {
                 bool isAdm = PrivilegeChecker.PrivCheck();
                 PrintIntro(isAdm);
+                var summary = new ProcessChecker().Check();
+                summary += new ModuleChecker().Check();
+                summary += new DirectoryChecker().Check();
+                summary += new ServiceChecker().Check();
+                summary += new RegistryChecker().Check();
+                summary += new AdsChecker().Check();
+                summary += new BrowserExtensionChecker().Check();
+                summary += new DriverChecker().Check();
+                summary += new DnsCacheChecker().Check();
+                summary += new EtwProviderChecker().Check();
+                summary += new EventLogProviderChecker().Check();
+                summary += new ScheduledTaskChecker().Check();
+                summary += new WmiConsumerChecker().Check();
+                summary += new NetworkChecker().Check();
+                summary += new SecurityProductChecker().Check();
+                summary += new ForensicToolChecker().Check();
+                summary += new RemoteAccessToolChecker().Check();
 
-                var allCheckers = new List<IChecker>
-                {
-                    new RegistryChecker(),
-                    new ProcessChecker(),
-                    new ModuleChecker(),
-                    new DirectoryChecker(),
-                    new AdsChecker(),
-                    new ServiceChecker(),
-                    new DriverChecker(),
-                    new NetworkChecker(),
-                    new DnsCacheChecker(),
-                    new EventLogProviderChecker(),
-                    new WmiConsumerChecker(),
-                    new EtwProviderChecker(),
-                    new BrowserExtensionChecker(),
-                    new ScheduledTaskChecker(),
-                    new SecurityProductChecker(),
-                    new ForensicToolChecker(),
-                    new RemoteAccessToolChecker()
-                };
-
-                List<IChecker> checkersToRun;
-                if (args.Length > 0)
-                {
-                    if (args.Length == 1 && args[0].ToLower() == "list")
-                    {
-                        Console.WriteLine("\n[+] Available checks:");
-                        foreach (var checker in allCheckers)
-                        {
-                            Console.WriteLine($"\t- {checker.Name}");
-                        }
-                        Console.WriteLine();
-                        return;
-                    }
-                    Console.WriteLine($"[+] Running specified checks: {string.Join(", ", args)}\n");
-                    var requestedChecks = new HashSet<string>(args.Select(a => a.ToLower()));
-                    checkersToRun = allCheckers.Where(c => requestedChecks.Contains(c.Name.ToLower())).ToList();
-                }
-                else
-                {
-                    checkersToRun = allCheckers;
-                }
-
-                var summaryBuilder = new StringBuilder();
-                foreach (var checker in checkersToRun)
-                {
-                    summaryBuilder.Append(checker.Check());
-                }
-
-                PrintOutro(summaryBuilder.ToString());
+                PrintOutro(summary);
 #if DEBUG
                 Console.WriteLine("Press Enter to continue...");
                 Console.ReadLine();

@@ -1,39 +1,29 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SharpEDRChecker
 {
     internal static class EDRMatcher
     {
-        private static List<string> _decodedKeywords;
-        private static readonly object _lock = new object();
-
-        private static void EnsureKeywordsDecoded()
-        {
-            if (_decodedKeywords == null)
-            {
-                lock (_lock) // Ensure thread-safe initialization
-                {
-                    if (_decodedKeywords == null)
-                    {
-                        _decodedKeywords = EDRData.edrlist
-                            .Select(encoded => Encoding.UTF8.GetString(System.Convert.FromBase64String(encoded)))
-                            .ToList();
-                    }
-                }
-            }
-        }
+        // Use Lazy<T> for thread-safe, lazy initialization of the keyword list.
+        // The keywords are pre-processed (converted to lowercase) for performance.
+        private static readonly Lazy<List<string>> _keywords = new Lazy<List<string>>(() =>
+            EDRData.edrlist
+                .Select(keyword => keyword.ToLower())
+                .Distinct() // Remove any duplicates
+                .ToList()
+        );
 
         internal static List<string> GetMatches(string input)
         {
             if (string.IsNullOrEmpty(input))
             {
-                return new List<string>();
+                return new List<string>(); // Return empty list for empty input
             }
 
-            EnsureKeywordsDecoded();
-            return _decodedKeywords.Where(edr => input.ToLower().Contains(edr.ToLower())).ToList();
+            var lowerInput = input.ToLower();
+            return _keywords.Value.Where(edr => lowerInput.Contains(edr)).ToList();
         }
     }
 }
