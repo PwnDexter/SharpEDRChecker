@@ -4,6 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # User-specific files
+.DS_Store
+.vscode/
 *.rsuser
 *.suo
 *.user
@@ -94,3 +96,5 @@ ipch/
 
 # Rider
 .idea/
+
+.fake

@@ -1,0 +1,41 @@
+name: Build (Windows / net48)
+
+on:
+  push:
+    branches: ["master", "main"]
+  pull_request:
+    branches: ["master", "main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Provides nuget.exe on the runner
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      # Provides MSBuild (Visual Studio Build Tools) on the runner
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore SharpEDRChecker.sln
+
+      - name: Build (Release)
+        run: msbuild SharpEDRChecker.sln /m /p:Configuration=Release /p:Platform="Any CPU"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SharpEDRChecker-Release
+          path: |
+            SharpEDRChecker/bin/Release/**
+            SharpEDRChecker/bin/x64/Release/**
+            SharpEDRChecker/bin/x86/Release/**
+          if-no-files-found: error
+          retention-days: 7
