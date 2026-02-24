@@ -2,9 +2,9 @@ name: Build (Windows / net48)
 
 on:
   push:
-    branches: ["master", "main"]
+    branches: ["master", "main", "dev"]
   pull_request:
-    branches: ["master", "main"]
+    branches: ["master", "main", "dev"]
   workflow_dispatch:
 
 jobs:
