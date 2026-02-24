@@ -20,7 +20,7 @@ git clone https://github.com/PwnDexter/SharpEDRChecker.git
 
 ## Dev Build - Instructions
 
-NOTE: This branch is for development and testing of new features. It may be unstable at times and should not be used in production environments. If you want to use the stable version, please use the main branch.
+**NOTE:** This branch is for development and testing of new features. It may be unstable at times and should not be used in production environments. If you want to use the stable version, please use the main branch.
 
 The Dev branch is where I add new features and test them before merging them into main. To build from the dev branch, clone the repo and checkout the dev branch:
 
